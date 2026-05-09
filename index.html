@@ -26,7 +26,9 @@
             margin: 0; padding: 0; color: var(--text-body);
             background: linear-gradient(-45deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3), var(--bg-gradient-1));
             background-size: 300% 300%; animation: softSky 20s ease-in-out infinite;
-            display: flex; flex-direction: column; height: 100vh;
+            display: flex; flex-direction: column; 
+            /* スマホのURLバー考慮の高さ指定（対応ブラウザ用） */
+            height: 100vh; height: 100dvh; 
             -webkit-font-smoothing: antialiased; overflow: hidden;
             overscroll-behavior-y: none;
         }
@@ -50,10 +52,8 @@
            Weather Banner (Compact Matrix)
         ========================================= */
         .weather-banner-container {
-            margin: 5px 24px 10px; display: none; animation: fadeIn 0.5s ease; flex-shrink: 0;
-            max-height: 25vh; /* 天気エリアが大きくなりすぎないように制限 */
-            overflow-y: auto; /* 万が一ロケ地が多すぎる場合はここだけスクロール */
-            border-radius: var(--radius-md); /* スクロール時の角丸 */
+            margin: 5px 24px 0; display: none; animation: fadeIn 0.5s ease; flex-shrink: 0;
+            max-height: 25vh; overflow-y: auto; border-radius: var(--radius-md);
         }
         .weather-banner-container::-webkit-scrollbar { display: none; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
@@ -67,12 +67,8 @@
         .w-matrix-row:last-child { border-bottom: none; }
         .w-matrix-header { background: rgba(240, 249, 255, 0.7); }
         
-        .w-matrix-cell {
-            flex: 1; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-right: 1px solid rgba(186, 230, 253, 0.6); min-width: 0; text-align: center;
-        }
+        .w-matrix-cell { flex: 1; padding: 6px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 1px solid rgba(186, 230, 253, 0.6); min-width: 0; text-align: center; }
         .w-matrix-cell:last-child { border-right: none; }
-        
         .w-matrix-loc-name { flex: 1.2; font-weight: 800; color: var(--primary-hover); font-size: clamp(0.6rem, 2.2vw, 0.85rem); word-break: auto-phrase; }
         .w-matrix-date { font-size: clamp(0.65rem, 2.2vw, 0.8rem); font-weight: 800; color: var(--text-body); }
         .w-icon { font-size: clamp(1rem, 3.5vw, 1.3rem); line-height: 1.1; }
@@ -85,10 +81,10 @@
         ========================================= */
         .dashboard { 
             display: flex; flex-wrap: wrap; 
-            padding: 5px 24px 24px; 
-            justify-content: center; align-items: center; align-content: center; /* 全体を中央に寄せる */
-            gap: 15px; /* マージンを小さくして敷き詰めやすく */
-            flex-grow: 1; overflow: hidden; /* スクロールを禁止し、1画面に収める */
+            padding: 10px 24px; /* 上下左右の余白 */
+            justify-content: center; align-items: center; align-content: center; 
+            flex-grow: 1; 
+            overflow: hidden; /* 絶対にスクロールさせない */
         }
 
         .circle-block { 
@@ -96,21 +92,20 @@
             background: var(--surface-white); border: 2px solid var(--border-soft); 
             display: flex; align-items: center; justify-content: center; text-align: center; cursor: pointer; 
             box-shadow: var(--shadow-soft); transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            /* JSでサイズを制御するためflexの基準値は持たせない */
+            flex-shrink: 0;
         }
         .circle-block:active { transform: scale(0.96); }
         .circle-block.add-new { background: transparent; border: 2px dashed rgba(14, 165, 233, 0.3); box-shadow: none; }
         
         .circle-title { 
             font-weight: 700; color: var(--text-heading); 
-            padding: 8px; line-height: 1.3; display: -webkit-box; 
-            -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; 
-            /* 丸のサイズに応じて文字も小さくする（JSで制御） */
+            line-height: 1.2; display: -webkit-box; 
+            -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; 
+            pointer-events: none; /* テキスト選択を防ぎタップしやすく */
         }
         
         .badge { 
-            position: absolute; top: 0; right: 0; 
-            background: var(--badge-bg); color: #ffffff; font-weight: 700; 
+            position: absolute; background: var(--badge-bg); color: #ffffff; font-weight: 700; 
             border-radius: 50%; display: flex; align-items: center; justify-content: center; 
             box-shadow: 0 4px 10px rgba(125, 211, 252, 0.5); border: 2px solid var(--surface-solid); z-index: 2; 
         }
@@ -283,7 +278,7 @@
         }
 
         // ==========================================
-        // タスク管理ロジック (Auto-Fit 制御追加)
+        // タスク管理ロジック (最適配置アルゴリズム)
         // ==========================================
         const STORAGE_KEY = 'pm_task_board_v7_dynamic'; 
         let blocks = []; let currentBlockId = null; let showCompleted = false;
@@ -297,31 +292,52 @@
                 if(currentBlockId) { const block = blocks.find(b => b.id === currentBlockId); if(block) { block.title = e.target.value; saveData(); renderDashboard(); } }
             });
             
-            // 画面サイズが変わった時にも再計算
-            window.addEventListener('resize', renderDashboard);
+            // 画面サイズ変更時に再計算して敷き詰める
+            window.addEventListener('resize', () => {
+                requestAnimationFrame(renderDashboard);
+            });
         });
 
         function loadData() { const saved = localStorage.getItem(STORAGE_KEY); if(saved) blocks = JSON.parse(saved); else { blocks = [{ id: '1', title: 'STUDIO', items: [{ id: 't1', text: '都内Aスタジオ 仮キープ', completed: false }] }]; saveData(); } }
         function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(blocks)); }
 
-        // 丸のサイズを自動計算して一画面に収める
+        // スクロールなしで画面に敷き詰めるための最適サイズ計算
         function renderDashboard() {
             const dashboardEl = document.getElementById('dashboard'); 
             dashboardEl.innerHTML = '';
             
-            // ダッシュボードの有効な描画領域を取得
-            const dashboardWidth = dashboardEl.clientWidth - 48; // padding左右分引く
-            const dashboardHeight = dashboardEl.clientHeight - 48;
-            const totalItems = blocks.length + 1; // 既存ブロック ＋ 追加ボタン
+            // ダッシュボードの実質的な描画領域を取得 (paddingを引く)
+            const dashboardWidth = dashboardEl.clientWidth - 48; 
+            const dashboardHeight = dashboardEl.clientHeight - 34; // 上下padding等考慮
             
-            // 💡 数に応じて基本サイズを動的計算（最大140px、最小40px）
-            // 面積から1個あたりの許容サイズを逆算する（簡易的な平方根計算）
-            let baseSize = Math.floor(Math.sqrt((dashboardWidth * dashboardHeight) / totalItems) * 0.7); 
-            
-            // 制限をかける
-            if (baseSize > 140) baseSize = 140;
-            if (baseSize < 50) baseSize = 50;
+            if (dashboardWidth <= 0 || dashboardHeight <= 0) return;
 
+            const totalItems = blocks.length + 1; // ブロック数 ＋ 追加ボタン
+            const gap = 10; // アイテム間の隙間(px)
+
+            // 💡 数学的なアプローチ：長方形内にN個の円を並べる際の最大直径を計算
+            let optimalSize = 0;
+            for (let cols = 1; cols <= totalItems; cols++) {
+                let rows = Math.ceil(totalItems / cols);
+                // 隙間を引いた上で1個あたりの許容サイズを計算
+                let maxW = (dashboardWidth - (cols - 1) * gap) / cols;
+                let maxH = (dashboardHeight - (rows - 1) * gap) / rows;
+                
+                // 幅と高さの厳しい方に合わせる
+                let currentSize = Math.min(maxW, maxH);
+                if (currentSize > optimalSize) {
+                    optimalSize = currentSize;
+                }
+            }
+
+            // サイズの上限・下限を設定（大きすぎず、小さすぎないように）
+            let baseSize = Math.floor(optimalSize);
+            if (baseSize > 140) baseSize = 140;
+            if (baseSize < 35) baseSize = 35; // 極小サイズまで許容する
+
+            dashboardEl.style.gap = `${gap}px`;
+
+            // 要素の描画
             blocks.forEach(block => {
                 const uncompletedCount = block.items.filter(item => !item.completed).length;
                 const circleEl = document.createElement('div'); 
@@ -334,32 +350,44 @@
                 const titleEl = document.createElement('div'); 
                 titleEl.className = 'circle-title'; 
                 titleEl.innerText = block.title || '無題'; 
-                // 文字サイズも丸の大きさに比例して小さくする
-                titleEl.style.fontSize = `${Math.max(0.6, baseSize / 130)}rem`;
                 
+                // 丸のサイズに合わせて文字の大きさやパディングを動的変更
+                const fontSize = Math.max(10, baseSize * 0.12); // 最低10px
+                titleEl.style.fontSize = `${fontSize}px`;
+                titleEl.style.padding = `${Math.max(2, baseSize * 0.08)}px`;
+                
+                // 丸が小さすぎる場合は行数を減らす
+                if (baseSize < 60) {
+                    titleEl.style.webkitLineClamp = '2';
+                }
+
                 circleEl.appendChild(titleEl);
                 
                 if (uncompletedCount > 0) { 
                     const badgeEl = document.createElement('div'); 
                     badgeEl.className = 'badge'; 
                     badgeEl.innerText = uncompletedCount; 
-                    // バッジのサイズも調整
+                    
+                    // バッジも丸のサイズに合わせて縮小
                     const badgeSize = Math.max(16, baseSize * 0.25);
                     badgeEl.style.width = `${badgeSize}px`;
                     badgeEl.style.height = `${badgeSize}px`;
-                    badgeEl.style.fontSize = `${badgeSize * 0.5}px`;
+                    badgeEl.style.fontSize = `${Math.max(9, badgeSize * 0.5)}px`;
+                    // 位置調整
+                    badgeEl.style.top = `-${badgeSize * 0.1}px`;
+                    badgeEl.style.right = `-${badgeSize * 0.1}px`;
                     
                     circleEl.appendChild(badgeEl); 
                 }
                 dashboardEl.appendChild(circleEl);
             });
             
-            // 追加ボタンの生成
+            // 追加ボタンの生成（同じサイズで描画）
             const addCircle = document.createElement('div'); 
             addCircle.className = 'circle-block add-new'; 
             addCircle.style.width = `${baseSize}px`; 
             addCircle.style.height = `${baseSize}px`; 
-            addCircle.innerHTML = `<div class="circle-title" style="font-size: ${Math.max(1, baseSize/60)}rem; font-weight: 300; color: #38bdf8;">＋</div>`; 
+            addCircle.innerHTML = `<div class="circle-title" style="font-size: ${Math.max(1.2, baseSize/40)}rem; font-weight: 300; color: #38bdf8;">＋</div>`; 
             addCircle.onclick = addNewBlock; 
             dashboardEl.appendChild(addCircle);
         }
@@ -409,7 +437,7 @@
 
 
         // ==========================================
-        // 天気予報ロジック (一覧表・高精度判定)
+        // 天気予報ロジック
         // ==========================================
         const WEATHER_KEY = 'pm_weather_matrix_v1';
         let tempSelectedLocations = []; let tempSelectedDates = [];
@@ -472,7 +500,13 @@
         function removeWeatherDate(dateVal) { tempSelectedDates = tempSelectedDates.filter(d => d !== dateVal); renderSelectedDates(); }
         function renderSelectedDates() { const container = document.getElementById('selected-dates-container'); container.innerHTML = ''; tempSelectedDates.forEach(dateVal => { const tag = document.createElement('div'); tag.className = 'tag-item'; tag.innerHTML = `<span>📅 ${formatDateForDisplay(dateVal)}</span><button onclick="removeWeatherDate('${dateVal}')">×</button>`; container.appendChild(tag); }); }
 
-        function disableWeather() { localStorage.removeItem(WEATHER_KEY); document.getElementById('weather-banner').style.display = 'none'; closeModal('weather-modal'); setTimeout(renderDashboard, 300); } // 天気が消えたら丸サイズ再計算
+        function disableWeather() { 
+            localStorage.removeItem(WEATHER_KEY); 
+            document.getElementById('weather-banner').style.display = 'none'; 
+            closeModal('weather-modal'); 
+            // 天気表示が消えて画面領域が広がるので、再計算して敷き詰める
+            setTimeout(() => { requestAnimationFrame(renderDashboard); }, 300); 
+        }
 
         async function saveWeatherSettings() {
             if (tempSelectedLocations.length === 0 || tempSelectedDates.length === 0) { alert('ロケ地と日程を最低1つ以上設定してください。'); return; }
@@ -493,8 +527,7 @@
             const data = JSON.parse(localStorage.getItem(WEATHER_KEY) || '{}'); if(!data.locations || data.locations.length === 0) return;
             const banner = document.getElementById('weather-banner'); banner.style.display = 'block'; banner.innerHTML = '<div style="color:var(--primary-blue); font-weight:bold; padding: 10px; text-align:center;">天気情報を取得中...</div>';
             
-            // 天気バナーが表示された分、ダッシュボードの領域が変わるので再計算
-            setTimeout(renderDashboard, 10); 
+            setTimeout(() => { requestAnimationFrame(renderDashboard); }, 10); 
 
             try {
                 const promises = data.locations.map(loc => {
@@ -541,8 +574,8 @@
             banner.innerHTML = html;
             banner.style.display = 'block';
             
-            // 天気の描画完了後に丸のサイズを再調整
-            setTimeout(renderDashboard, 10);
+            // 天気の描画で画面領域が変わったため、丸のサイズを再計算して敷き詰める
+            setTimeout(() => { requestAnimationFrame(renderDashboard); }, 10);
         }
     </script>
 </body>
