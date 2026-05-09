@@ -14,7 +14,7 @@
             --bg-gradient-3: #bae6fd;
             --surface-white: rgba(255, 255, 255, 0.85);
             --surface-solid: #ffffff;
-            --text-heading: #1e293b; /* 柔らかいが視認性の高いスレートグレー */
+            --text-heading: #1e293b;
             --text-body: #475569;
             --text-muted: #94a3b8;
             --primary-blue: #38bdf8;
@@ -28,7 +28,6 @@
             --radius-md: 12px;
         }
 
-        /* 非常にゆっくりとした空の揺らぎアニメーション */
         @keyframes softSky {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -78,37 +77,34 @@
         .dashboard {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            padding: 24px;
-            justify-content: flex-start;
+            gap: 25px; /* 丸同士の隙間を少し広く */
+            padding: 30px 24px;
+            /* サイズが違っても中央に綺麗に集まるように設定 */
+            justify-content: center; 
+            align-items: center;
+            align-content: flex-start;
             overflow-y: auto;
             padding-bottom: 120px;
         }
 
         .circle-block {
             position: relative;
-            width: calc(33.333% - 14px);
-            aspect-ratio: 1 / 1;
-            max-width: 140px;
-            max-height: 140px;
+            /* widthとheightはJSで動的に設定するため削除 */
+            border-radius: 50%;
             background: var(--surface-white);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 2px solid var(--border-soft);
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
             cursor: pointer;
             box-shadow: var(--shadow-soft);
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0; /* 丸が潰れるのを防ぐ */
         }
         
-        @media (min-width: 600px) {
-            .circle-block { width: 140px; }
-        }
-
         .circle-block:hover {
             transform: translateY(-4px) scale(1.03);
             background: var(--surface-solid);
@@ -131,30 +127,32 @@
             font-size: 0.95rem;
             font-weight: 700;
             color: var(--text-heading);
-            padding: 12px;
+            padding: 16px;
             line-height: 1.4;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 4; /* 文字が増えても大丈夫なように行数を増やす */
             -webkit-box-orient: vertical;
             overflow: hidden;
+            word-break: break-all;
         }
 
         .badge {
             position: absolute;
-            top: 4px;
-            right: 4px;
+            top: 5%;
+            right: 5%;
             background: var(--badge-bg);
             color: #ffffff;
             font-size: 0.85rem;
             font-weight: 700;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 10px rgba(125, 211, 252, 0.5);
             border: 3px solid var(--surface-solid);
+            z-index: 2;
         }
 
         /* =========================================
@@ -246,7 +244,6 @@
         }
         .task-item:hover { background: #ffffff; box-shadow: var(--shadow-soft); }
         
-        /* 丸くて優しいチェックボックス */
         .task-checkbox {
             appearance: none; width: 24px; height: 24px;
             border: 2px solid #bae6fd;
@@ -369,10 +366,7 @@
     </div>
 
     <script>
-        /**
-         * 状態管理とローカルストレージの制御
-         */
-        const STORAGE_KEY = 'pm_task_board_v6_soft'; 
+        const STORAGE_KEY = 'pm_task_board_v7_dynamic'; 
         let blocks = [];
         let currentBlockId = null;
         let showCompleted = false;
@@ -381,7 +375,6 @@
             loadData();
             renderDashboard();
 
-            // モーダルのタイトル編集イベント
             document.getElementById('modal-title').addEventListener('input', (e) => {
                 if(currentBlockId) {
                     const block = blocks.find(b => b.id === currentBlockId);
@@ -394,37 +387,46 @@
             });
         });
 
-        // データの読み込み処理
         function loadData() {
             const savedData = localStorage.getItem(STORAGE_KEY);
             if (savedData) {
                 blocks = JSON.parse(savedData);
             } else {
-                // 初期データ
                 blocks = [
                     { id: '1', title: 'STUDIO', items: [{ id: 't1', text: '都内Aスタジオ 仮キープ', completed: false }] },
-                    { id: '2', title: 'CATERING', items: [{ id: 't2', text: '朝食の手配', completed: false }] },
-                    { id: '3', title: 'CASTING', items: [{ id: 't3', text: 'オーディション資料作成', completed: false }] }
+                    { id: '2', title: 'CATERING', items: [{ id: 't2', text: '朝食の手配', completed: false }, { id: 't3', text: '昼食の手配', completed: false }, { id: 't4', text: 'アレルギー確認', completed: false }] },
+                    { id: '3', title: 'CASTING', items: [{ id: 't5', text: 'オーディション資料作成', completed: false }] }
                 ];
                 saveData();
             }
         }
 
-        // データの保存処理
         function saveData() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(blocks));
         }
 
-        // ダッシュボード（丸いカード）の描画
+        // --- ダッシュボードの描画（サイズ動的変更機能） ---
         function renderDashboard() {
             const dashboardEl = document.getElementById('dashboard');
             dashboardEl.innerHTML = '';
 
             blocks.forEach(block => {
+                const itemCount = block.items.length; // タスクの総数
                 const uncompletedCount = block.items.filter(item => !item.completed).length;
 
                 const circleEl = document.createElement('div');
                 circleEl.className = 'circle-block';
+                
+                // 💡 動的サイズ計算ロジック
+                // 基本サイズ110pxをベースに、タスクが1つ増えるごとに12pxずつ大きくする（最大240pxまで）
+                const baseSize = 110;
+                const growthRate = 12;
+                const maxSize = 240;
+                const calculatedSize = Math.min(baseSize + (itemCount * growthRate), maxSize);
+                
+                circleEl.style.width = `${calculatedSize}px`;
+                circleEl.style.height = `${calculatedSize}px`;
+
                 circleEl.onclick = () => openModal(block.id);
 
                 const titleEl = document.createElement('div');
@@ -432,7 +434,6 @@
                 titleEl.innerText = block.title || '無題';
                 circleEl.appendChild(titleEl);
 
-                // 未完了タスクのバッジ表示
                 if (uncompletedCount > 0) {
                     const badgeEl = document.createElement('div');
                     badgeEl.className = 'badge';
@@ -443,15 +444,16 @@
                 dashboardEl.appendChild(circleEl);
             });
 
-            // 新規追加ボタン
+            // 新規追加ボタン（サイズは固定の110px）
             const addCircle = document.createElement('div');
             addCircle.className = 'circle-block add-new';
-            addCircle.innerHTML = '<div class="circle-title" style="font-size: 2.2rem; font-weight: 300;">＋</div>';
+            addCircle.style.width = '110px';
+            addCircle.style.height = '110px';
+            addCircle.innerHTML = '<div class="circle-title" style="font-size: 2.2rem; font-weight: 300; color: #38bdf8;">＋</div>';
             addCircle.onclick = addNewBlock;
             dashboardEl.appendChild(addCircle);
         }
 
-        // 新規ブロックの作成
         function addNewBlock() {
             const newBlock = { id: Date.now().toString(), title: 'New Category', items: [] };
             blocks.push(newBlock);
@@ -460,7 +462,6 @@
             openModal(newBlock.id);
         }
 
-        // モーダルの開閉処理
         function openModal(blockId) {
             currentBlockId = blockId;
             const block = blocks.find(b => b.id === blockId);
@@ -473,7 +474,7 @@
 
             renderTasks();
             document.getElementById('modal').classList.add('active');
-            document.body.style.overflow = 'hidden'; // 背景スクロールの防止
+            document.body.style.overflow = 'hidden'; 
         }
 
         function closeModal() {
@@ -487,7 +488,6 @@
             if(e.target === document.getElementById('modal')) closeModal();
         });
 
-        // タスクリストの描画
         function renderTasks() {
             const block = blocks.find(b => b.id === currentBlockId);
             if(!block) return;
@@ -530,7 +530,6 @@
             });
         }
 
-        // タスクの追加と更新
         function addTask() {
             const input = document.getElementById('new-task-input');
             const text = input.value.trim();
@@ -542,7 +541,7 @@
             saveData();
             input.value = '';
             renderTasks();
-            renderDashboard();
+            renderDashboard(); // ここで再描画され、丸がスッと大きくなります
         }
 
         function handleEnter(e) {
@@ -577,7 +576,7 @@
             block.items = block.items.filter(t => t.id !== taskId);
             saveData();
             renderTasks();
-            renderDashboard();
+            renderDashboard(); // ここで再描画され、丸がスッと小さくなります
         }
 
         function toggleCompleted() {
