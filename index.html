@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PM CORE - Clear Blue Edition</title>
+    <title>PM CORE - Aqua Koi Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,8 +12,9 @@
 
     <style>
         :root {
-            --bg-1: #ffffff; --bg-2: #e0f2fe; --bg-3: #bae6fd; --bg-4: #7dd3fc;
-            --surface: rgba(255, 255, 255, 0.85);
+            /* ✨ より淡く、透き通るような水色グラデーション */
+            --bg-1: #e0f2fe; --bg-2: #bae6fd; --bg-3: #7dd3fc; --bg-4: #e0f2fe;
+            --surface: rgba(255, 255, 255, 0.75);
             --text: #0f172a; --text-m: #64748b;
             --primary: #0ea5e9; 
             --radius-xl: 32px; --radius-lg: 24px;
@@ -24,8 +25,37 @@
         body {
             font-family: 'Nunito', 'Zen Maru Gothic', sans-serif;
             margin: 0; background: linear-gradient(-45deg, var(--bg-1), var(--bg-2), var(--bg-3), var(--bg-4));
-            background-size: 400% 400%; animation: aurora 12s ease infinite;
+            background-size: 400% 400%; animation: aurora 15s ease infinite;
             display: flex; flex-direction: column; height: 100dvh; overflow: hidden; color: var(--text);
+            position: relative;
+        }
+
+        /* ✨ 水面の煌めきと揺らぎをSVGフィルターで表現 */
+        body::before {
+            content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: overlay; opacity: 0.4;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
+        }
+
+        /* ✨ タップ時に広がる水の波紋エフェクト */
+        .ripple {
+            position: fixed; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.8);
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            animation: rippleAnim 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes rippleAnim {
+            0% { width: 0; height: 0; opacity: 1; border-width: 4px; }
+            100% { width: 150px; height: 150px; opacity: 0; border-width: 1px; }
+        }
+
+        /* ✨ タスク完了で落ちる「鯉の餌」 */
+        .fish-food {
+            position: fixed; width: 12px; height: 12px; border-radius: 50%;
+            transform: translate(-50%, -50%); box-shadow: 0 0 8px rgba(255,255,255,0.9);
+            z-index: 10; animation: floatFood 1.5s infinite ease-in-out; pointer-events: none;
+        }
+        @keyframes floatFood {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.9; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.5; }
         }
 
         #loading-screen {
@@ -35,10 +65,10 @@
         .loader { width: 60px; height: 60px; border: 8px solid var(--bg-2); border-top: 8px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); border-bottom: 2px solid #fff; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(255,255,255,0.5); backdrop-filter: blur(10px); border-bottom: 2px solid rgba(255,255,255,0.6); z-index: 20;}
         .project-select { padding: 8px 15px; border-radius: 50px; border: 2px solid #fff; font-weight: 900; font-family: inherit; color: #0284c7; background: var(--surface); cursor: pointer; outline:none; }
         
-        header { padding: 15px 20px 5px; display: flex; justify-content: space-between; align-items: flex-start; }
+        header { padding: 15px 20px 5px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 20;}
         .header-titles h1 { margin: 0; font-size: 1.6rem; font-weight: 900; color:#0f172a;}
         .header-titles p { margin: 0; font-size: 0.85rem; font-weight: 800; color: #0284c7; max-width: 75vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
@@ -49,13 +79,13 @@
         .dashboard { 
             display: flex; flex-wrap: wrap; padding: 30px 24px; 
             justify-content: center; align-content: flex-start;
-            flex-grow: 1; overflow-y: auto; gap: 20px;
+            flex-grow: 1; overflow-y: auto; gap: 20px; z-index: 20;
         }
 
         .circle-block { 
-            position: relative; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6)); 
-            border: 4px solid #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-            cursor: pointer; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.1); 
+            position: relative; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.4)); 
+            border: 4px solid rgba(255,255,255,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
+            cursor: pointer; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15); backdrop-filter: blur(5px);
             user-select: none; -webkit-user-select: none; flex-shrink: 0;
         }
 
@@ -71,22 +101,22 @@
         .jelly-anim { animation: jelly 0.6s ease; }
 
         .circle-title { font-weight: 900; line-height: 1.2; padding: 0 10%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color:#0f172a;}
-        .circle-creator { font-size: 0.6rem; font-weight: 800; margin-top: 4px; opacity: 0.7; pointer-events: none;}
+        .circle-creator { font-size: 0.6rem; font-weight: 800; margin-top: 4px; opacity: 0.8; pointer-events: none;}
         .badge { position: absolute; top: 0; right: 0; transform: translate(15%, -15%); color: #fff; font-weight: 900; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; z-index: 2; pointer-events: none;}
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: #fff; width: 100%; max-height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        @media (min-width: 600px) { .modal-overlay { align-items: center; } .modal-content { width: 450px; border-radius: var(--radius-xl); animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); } }
+        .modal-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); width: 100%; max-height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
+        @media (min-width: 600px) { .modal-overlay { align-items: center; } .modal-content { width: 450px; border-radius: var(--radius-xl); animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 10px 40px rgba(0,0,0,0.1);} }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .modal-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-title-input { font-family: inherit; border: none; font-size: 1.5rem; font-weight: 900; width: 100%; outline: none; color:#0f172a;}
+        .modal-title-input { font-family: inherit; border: none; font-size: 1.5rem; font-weight: 900; width: 100%; outline: none; color:#0f172a; background:transparent;}
         .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: 900; cursor: pointer; color:var(--text-m);}
 
         .task-list { padding: 0 24px; overflow-y: auto; flex-grow: 1; }
-        .task-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; background: #f8fafc; border-radius: var(--radius-lg); border: 2px solid #f1f5f9; }
+        .task-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; background: rgba(248, 250, 252, 0.8); border-radius: var(--radius-lg); border: 2px solid #e2e8f0; }
         .drag-handle { cursor: grab; padding: 5px; margin-right: 10px; color: #cbd5e1; font-size: 1.2rem; user-select: none; }
         .task-checkbox { appearance: none; width: 22px; height: 22px; border-radius: 6px; border: 3px solid #cbd5e1; margin-right: 12px; cursor: pointer; position: relative; }
         .task-checkbox:checked { background: var(--primary); border-color: var(--primary); }
@@ -95,6 +125,9 @@
         .task-text { font-family: inherit; font-weight: 700; outline: none; color:#0f172a;}
         .task-item.completed .task-text { text-decoration: line-through; opacity: 0.5; }
         .task-tag { font-size: 0.7rem; font-weight: 900; padding: 2px 8px; border-radius: 10px; color: #fff; margin-top: 4px; display: inline-block; }
+
+        .toggle-completed-btn { background: transparent; border: 2px dashed #cbd5e1; color: #64748b; font-weight: 800; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; margin-bottom: 15px; width: 100%; font-family: inherit; transition: 0.2s; }
+        .toggle-completed-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0f9ff;}
 
         .add-area { padding: 20px 24px; display: flex; gap: 8px; border-top: 2px dashed #f1f5f9; }
         .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; color:#0f172a; outline: none;}
@@ -114,6 +147,19 @@
     </style>
 </head>
 <body>
+
+    <svg id="koi-fish" viewBox="0 0 100 120" style="position:fixed; width:40px; height:48px; pointer-events:none; z-index: 5; transform-origin: center center; opacity: 0.9;">
+        <defs>
+            <linearGradient id="koiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style="stop-color:#ff7e67;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+            </linearGradient>
+        </defs>
+        <path d="M45,35 Q15,40 25,65 Z" fill="rgba(255,255,255,0.8)"/>
+        <path d="M55,35 Q85,40 75,65 Z" fill="rgba(255,255,255,0.8)"/>
+        <path d="M50,10 C70,25 65,65 50,90 C35,65 30,25 50,10 Z" fill="url(#koiGrad)"/>
+        <path d="M50,85 C65,100 60,115 50,120 C40,115 35,100 50,85 Z" fill="rgba(255,126,103,0.9)"/>
+    </svg>
 
     <div id="loading-screen"><div class="loader"></div><p style="margin-top:20px; font-weight:900; color:var(--primary)">Loading PM Tasks...</p></div>
 
@@ -162,8 +208,11 @@
     <div id="modal" class="modal-overlay" onclick="if(event.target==this)window.closeM('modal')">
         <div class="modal-content">
             <div class="modal-header"><input type="text" id="m-title" class="modal-title-input" onblur="window.saveName()"><button class="close-btn" onclick="window.closeM('modal')">✕</button></div>
-            <div id="task-list" class="task-list"></div>
-            <div class="add-area"><select id="ass-sel" class="assign-sel"></select><input type="text" id="t-input" class="add-input" placeholder="タスクを追加..."><button class="add-btn" onclick="window.addTask()">追加</button></div>
+            
+            <div id="active-task-list" class="task-list" style="margin-bottom: 0;"></div>
+            <div id="completed-task-section" style="padding: 0 24px 10px; flex-shrink: 0;"></div>
+            
+            <div class="add-area"><select id="ass-sel" class="assign-sel"></select><input type="text" id="t-input" class="add-input" placeholder="タスクを追加..." onkeypress="if(event.key=='Enter')window.addTask()"><button class="add-btn" onclick="window.addTask()">追加</button></div>
             <button style="color:#f43f5e; border:none; background:none; padding:15px; font-weight:900; cursor:pointer;" onclick="window.delBlock()">🗑 このカテゴリを削除</button>
         </div>
     </div>
@@ -193,11 +242,26 @@
 
         let user = null, myP = null, pjs = [], curPId = null, curPD = null, curBId = null, tempPhoto = "";
         let isDraggingCircle = false;
-        
+        let showCompletedTasks = false; 
         let memberProfiles = {};
+        
+        // ✨ クリック位置記憶（餌や波紋の起点用）
+        let lastClickX = window.innerWidth / 2;
+        let lastClickY = window.innerHeight / 2;
 
         const colors = ["#38bdf8", "#fb7185", "#34d399", "#fbbf24", "#a78bfa", "#f472b6", "#fb923c", "#0f172a"];
         let selC = colors[0];
+
+        // ✨ 画面全体のタップで水の波紋を出す
+        document.addEventListener('click', (e) => {
+            lastClickX = e.clientX; lastClickY = e.clientY;
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple';
+            ripple.style.left = e.clientX + 'px';
+            ripple.style.top = e.clientY + 'px';
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 800);
+        });
 
         function buildColors(containerId) {
             const ctn = document.getElementById(containerId); ctn.innerHTML = '';
@@ -227,7 +291,7 @@
                 const d = await getDoc(doc(db, "users", u.uid));
                 if (d.exists()) { 
                     myP = d.data(); 
-                    myP._isDummy = false; // ✨ Google登録済みフラグ
+                    myP._isDummy = false; 
                     memberProfiles[user.email] = myP; 
                     updateHeaderIcon(); 
                     loadPJs(); 
@@ -258,10 +322,7 @@
             if(!name) return alert("名前を入力してね");
             myP = { email: user.email, name, color: selC, photo: tempPhoto };
             await setDoc(doc(db, "users", user.uid), myP);
-            
-            myP._isDummy = false;
-            memberProfiles[user.email] = myP;
-            
+            myP._isDummy = false; memberProfiles[user.email] = myP;
             await addDoc(collection(db, "projects"), { title: "My Tasks", members: [user.email], blocks: [] });
             location.reload();
         };
@@ -277,10 +338,7 @@
             const name = document.getElementById('edit-n').value; if(!name) return;
             myP.name = name; myP.color = selC; myP.photo = tempPhoto;
             await setDoc(doc(db, "users", user.uid), myP, {merge: true});
-            memberProfiles[user.email] = myP; 
-            updateHeaderIcon(); 
-            window.closeM('profile-m');
-            syncCurPJ(); 
+            memberProfiles[user.email] = myP; updateHeaderIcon(); window.closeM('profile-m'); syncCurPJ(); 
         };
 
         function updateHeaderIcon() {
@@ -305,9 +363,7 @@
                 }
             }
             if (needsUpdate) {
-                updateHeaderMembers();
-                updateAssList();
-                renderDash();
+                updateHeaderMembers(); updateAssList(); renderDash();
                 if(curBId) renderTasks();
             }
         }
@@ -319,11 +375,8 @@
                 updateProjList();
                 const savedProjId = localStorage.getItem('last_proj_id');
                 if (pjs.length > 0) {
-                    if (savedProjId && pjs.find(p => p.id === savedProjId)) {
-                        curPId = savedProjId;
-                    } else if (!curPId || !pjs.find(p => p.id === curPId)) {
-                        curPId = pjs[0].id;
-                    }
+                    if (savedProjId && pjs.find(p => p.id === savedProjId)) { curPId = savedProjId; } 
+                    else if (!curPId || !pjs.find(p => p.id === curPId)) { curPId = pjs[0].id; }
                     document.getElementById('proj-sel').value = curPId;
                     syncCurPJ();
                 }
@@ -335,16 +388,11 @@
             const p = pjs.find(x => x.id == curPId); if(!p) return;
             curPD = p.data;
             document.getElementById('header-pj-name').innerText = curPD.title;
-            
-            updateHeaderMembers();
-            renderDash(); 
-            updateAssList();
+            updateHeaderMembers(); renderDash(); updateAssList();
             if(curBId) renderTasks();
-
             fetchMemberProfiles();
         }
 
-        // ✨ Googleで参加している人だけヘッダーに名前を表示
         function updateHeaderMembers() {
             const activeMembers = curPD.members.filter(m => memberProfiles[m] && !memberProfiles[m]._isDummy);
             const names = activeMembers.map(m => memberProfiles[m].name);
@@ -407,46 +455,96 @@
             curBId = id; const b = curPD.blocks.find(x=>x.id==id);
             document.getElementById('m-title').value = b.title;
             document.getElementById('m-title').style.color = b.color;
+            showCompletedTasks = false; 
             renderTasks(); window.openM('modal');
         };
 
+        function createTaskDom(item) {
+            const div = document.createElement('div'); div.className = `task-item ${item.completed ? 'completed' : ''}`;
+            const displayName = (item.assEmail && memberProfiles[item.assEmail]) ? memberProfiles[item.assEmail].name : item.assName;
+            const displayColor = (item.assEmail && memberProfiles[item.assEmail]) ? memberProfiles[item.assEmail].color : (item.assColor || '#94a3b8');
+
+            div.innerHTML = `<div class="drag-handle" style="${item.completed ? 'visibility:hidden;' : ''}">≡</div>
+                             <input type="checkbox" class="task-checkbox" ${item.completed?'checked':''} onchange="window.toggleT('${item.id}', '${displayColor}')">
+                             <div class="task-content"><div class="task-text" contenteditable="${!item.completed}" onblur="window.editT('${item.id}', this.innerText)">${item.text}</div>
+                             <span class="task-tag" style="background:${displayColor}">${displayName}</span></div>
+                             <button style="border:none; background:none; cursor:pointer; font-size:1.2rem; color:#cbd5e1;" onclick="window.delT('${item.id}')">✕</button>`;
+            return div;
+        }
+
         function renderTasks() {
             const b = curPD.blocks.find(x=>x.id==curBId);
-            const container = document.getElementById('task-list'); container.innerHTML = '';
+            const activeContainer = document.getElementById('active-task-list');
+            const compSection = document.getElementById('completed-task-section');
+            activeContainer.innerHTML = ''; compSection.innerHTML = '';
+            
             if(!b.items) b.items = [];
-            b.items.forEach(item => {
-                const div = document.createElement('div'); div.className = `task-item ${item.completed ? 'completed' : ''}`;
-                
-                const displayName = (item.assEmail && memberProfiles[item.assEmail]) ? memberProfiles[item.assEmail].name : item.assName;
-                const displayColor = (item.assEmail && memberProfiles[item.assEmail]) ? memberProfiles[item.assEmail].color : (item.assColor || '#94a3b8');
+            
+            const activeTasks = b.items.filter(i => !i.completed);
+            const completedTasks = b.items.filter(i => i.completed);
 
-                div.innerHTML = `<div class="drag-handle">≡</div>
-                                 <input type="checkbox" class="task-checkbox" ${item.completed?'checked':''} onchange="window.toggleT('${item.id}')">
-                                 <div class="task-content"><div class="task-text" contenteditable="true" onblur="window.editT('${item.id}', this.innerText)">${item.text}</div>
-                                 <span class="task-tag" style="background:${displayColor}">${displayName}</span></div>
-                                 <button style="border:none; background:none; cursor:pointer; font-size:1.2rem; color:#cbd5e1;" onclick="window.delT('${item.id}')">✕</button>`;
-                container.appendChild(div);
-            });
+            activeTasks.forEach(item => activeContainer.appendChild(createTaskDom(item)));
+
+            if(completedTasks.length > 0) {
+                const btn = document.createElement('button');
+                btn.className = 'toggle-completed-btn';
+                btn.innerText = showCompletedTasks ? '完了したタスクを隠す ∧' : `完了したタスクを表示 (${completedTasks.length}) ∨`;
+                btn.onclick = () => { showCompletedTasks = !showCompletedTasks; renderTasks(); };
+                compSection.appendChild(btn);
+
+                if(showCompletedTasks) {
+                    const compContainer = document.createElement('div');
+                    completedTasks.forEach(item => compContainer.appendChild(createTaskDom(item)));
+                    compSection.appendChild(compContainer);
+                }
+            }
+
             if(window.taskSortable) window.taskSortable.destroy();
-            window.taskSortable = Sortable.create(container, { animation: 150, handle: '.drag-handle', onEnd: async (e) => { const moved = b.items.splice(e.oldIndex, 1)[0]; b.items.splice(e.newIndex, 0, moved); await save(); } });
+            window.taskSortable = Sortable.create(activeContainer, { 
+                animation: 150, handle: '.drag-handle', 
+                onEnd: async (e) => { 
+                    if(e.oldIndex === e.newIndex) return;
+                    const moved = activeTasks.splice(e.oldIndex, 1)[0]; 
+                    activeTasks.splice(e.newIndex, 0, moved); 
+                    b.items = [...activeTasks, ...completedTasks];
+                    await save(); 
+                } 
+            });
         }
 
         window.addTask = async () => {
             const input = document.getElementById('t-input'), text = input.value.trim(); if(!text) return;
             const assE = document.getElementById('ass-sel').value;
-            
             const profile = memberProfiles[assE] || { name: assE.split('@')[0], color: '#94a3b8' };
-
             const b = curPD.blocks.find(x=>x.id==curBId);
             if(!b.items) b.items = [];
-            b.items.push({ 
+            
+            b.items.unshift({ 
                 id: Date.now().toString(), text, completed: false, 
                 assName: profile.name, assEmail: assE, assColor: profile.color 
             });
             input.value = ''; await save();
         };
 
-        window.toggleT = async (tid) => { const b = curPD.blocks.find(x=>x.id==curBId); const i = b.items.find(x=>x.id==tid); i.completed = !i.completed; await save(); };
+        // ✨ タスク完了処理に「餌やり」ロジックを追加
+        window.toggleT = async (tid, color) => { 
+            const b = curPD.blocks.find(x=>x.id==curBId); 
+            const i = b.items.find(x=>x.id==tid); 
+            const wasCompleted = i.completed;
+            i.completed = !i.completed; 
+            
+            // 未完了から完了になった瞬間、餌を落とす
+            if (!wasCompleted && i.completed) {
+                spawnFood(lastClickX, lastClickY, color);
+            }
+
+            const active = b.items.filter(x => !x.completed);
+            const comp = b.items.filter(x => x.completed);
+            b.items = [...active, ...comp];
+            
+            await save(); 
+        };
+
         window.editT = async (tid, txt) => { const b = curPD.blocks.find(x=>x.id==curBId); const i = b.items.find(x=>x.id==tid); if(i.text != txt){ i.text = txt; await save(); } };
         window.delT = async (tid) => { const b = curPD.blocks.find(x=>x.id==curBId); b.items = b.items.filter(x=>x.id!=tid); await save(); };
         window.saveName = async () => { const b = curPD.blocks.find(x=>x.id==curBId); const val = document.getElementById('m-title').value; if(b.title != val) { b.title = val; await save(); } };
@@ -461,32 +559,98 @@
         window.createPJ = async () => { const t = document.getElementById('new-p-t').value; if(!t) return; await addDoc(collection(db, "projects"), { title: t, members: [user.email], blocks: [] }); window.closeM('new-p-m'); };
         window.sendInv = async () => { const e = document.getElementById('inv-e').value; if(!e) return; if(!curPD.members.includes(e)) { curPD.members.push(e); await save(); alert("招待しました"); } window.closeM('invite-m'); };
         
-        window.switchProj = () => { 
-            curPId = document.getElementById('proj-sel').value; 
-            localStorage.setItem('last_proj_id', curPId); 
-            syncCurPJ(); 
-        };
-
+        window.switchProj = () => { curPId = document.getElementById('proj-sel').value; localStorage.setItem('last_proj_id', curPId); syncCurPJ(); };
         async function save() { await setDoc(doc(db, "projects", curPId), curPD); }
+        
         window.openM = (id) => document.getElementById(id).classList.add('active');
         window.closeM = (id) => { document.getElementById(id).classList.remove('active'); if(id=='modal') curBId=null; };
         function hideLoading() { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(() => document.getElementById('loading-screen').style.display='none', 500); }
         window.addEventListener('resize', renderDash);
         
         function updateProjList() { const sel = document.getElementById('proj-sel'); sel.innerHTML = ''; pjs.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.innerText = p.data.title; sel.appendChild(o); }); sel.value = curPId; }
-        
-        // ✨ Googleで参加している人だけをドロップダウンに表示
-        function updateAssList() { 
-            const sel = document.getElementById('ass-sel'); sel.innerHTML = ''; 
-            const activeMembers = curPD.members.filter(m => memberProfiles[m] && !memberProfiles[m]._isDummy);
-            activeMembers.forEach(m => { 
-                const o = document.createElement('option'); 
-                o.value = m; 
-                o.innerText = memberProfiles[m].name; 
-                sel.appendChild(o); 
-            }); 
-            sel.value = user.email; 
+        function updateAssList() { const sel = document.getElementById('ass-sel'); sel.innerHTML = ''; const activeMembers = curPD.members.filter(m => memberProfiles[m] && !memberProfiles[m]._isDummy); activeMembers.forEach(m => { const o = document.createElement('option'); o.value = m; o.innerText = memberProfiles[m].name; sel.appendChild(o); }); sel.value = user.email; }
+
+        // ✨ 鯉の成長と泳ぐロジック
+        let koiEl = document.getElementById('koi-fish');
+        let kX = window.innerWidth / 2, kY = window.innerHeight / 2;
+        let kAngle = 0, kSize = 1.0;
+        let speed = 1.2;
+        let currentTarget = null;
+        let foods = [];
+
+        function spawnFood(x, y, color) {
+            const food = document.createElement('div');
+            food.className = 'fish-food';
+            food.style.left = x + 'px';
+            food.style.top = y + 'px';
+            food.style.backgroundColor = color || '#ffcc00';
+            document.body.appendChild(food);
+            foods.push({ el: food, x, y });
         }
+
+        function updateKoi() {
+            if (!koiEl) return;
+            let tx, ty;
+            
+            if (foods.length > 0) {
+                // 餌がある場合は一番最初の餌をターゲットにする
+                tx = foods[0].x; ty = foods[0].y;
+                speed = 3.5; // 餌を見つけたら少し速く泳ぐ
+            } else {
+                // 餌がない場合はランダムに散歩
+                if (!currentTarget || Math.random() < 0.005) {
+                    currentTarget = { x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight };
+                }
+                tx = currentTarget.x; ty = currentTarget.y;
+                speed = 1.0;
+            }
+
+            let dx = tx - kX;
+            let dy = ty - kY;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+
+            // 餌を食べたときの処理
+            if (foods.length > 0 && dist < 30) {
+                let f = foods.shift();
+                f.el.remove();
+                kSize = Math.min(kSize + 0.08, 4.0); // 食べるたびに成長（最大サイズ4倍まで）
+                
+                // 食べた時に小さな波紋を出す
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                ripple.style.left = kX + 'px'; ripple.style.top = kY + 'px';
+                ripple.style.width = '50px'; ripple.style.height = '50px';
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 800);
+            }
+
+            // 目的地に向かって泳ぐ計算
+            if (dist > speed) {
+                let targetAngle = Math.atan2(dy, dx);
+                let deltaAngle = targetAngle - kAngle;
+                
+                // 最短距離で滑らかに回転させる
+                while (deltaAngle > Math.PI) deltaAngle -= Math.PI * 2;
+                while (deltaAngle < -Math.PI) deltaAngle += Math.PI * 2;
+                kAngle += deltaAngle * 0.04;
+
+                kX += Math.cos(kAngle) * speed;
+                kY += Math.sin(kAngle) * speed;
+            }
+
+            // SVGは上が頭(Y-マイナス方向)なので、進行方向の角度に+90度(PI/2)補正する
+            let displayAngle = kAngle + (Math.PI / 2);
+            
+            koiEl.style.left = kX + 'px';
+            koiEl.style.top = kY + 'px';
+            koiEl.style.transform = `translate(-50%, -50%) scale(${kSize}) rotate(${displayAngle}rad)`;
+
+            requestAnimationFrame(updateKoi);
+        }
+        
+        // 鯉のループ開始
+        updateKoi();
+
     </script>
 </body>
 </html>
