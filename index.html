@@ -70,25 +70,20 @@
         .icon-btn:hover { transform: scale(1.05); }
         .icon-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* ✨ ダッシュボードは横並び（wrap）でタスクやバーを配置 */
         .dashboard { 
             display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; 
             flex-grow: 1; overflow-y: auto; overflow-x: hidden; 
             z-index: 20; padding: 20px 15px 100px; gap: 15px; width: 100%;
         }
 
-        /* =========================================
-           ✨ 新UI：島（グループ）を横幅100%の「バー」に変更
-           ========================================= */
         .group-row-container {
-            width: 100%; flex-basis: 100%; /* 常に1行を占有し、横の要素を押し出さない */
+            width: 100%; flex-basis: 100%; 
             display: flex; flex-direction: column;
             margin: 5px 0; transition: all 0.3s ease;
         }
 
         .group-header-bar {
             width: 100%; min-height: 60px;
-            /* ✨ シンプルな濃淡の違い（濃いめのすりガラス）と太い白枠（2px） */
             background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.9);
             border-radius: var(--radius-lg);
@@ -108,7 +103,7 @@
         .group-title { 
             background: transparent; border: none; font-weight: 900; color: #0f172a; outline: none; 
             font-family: inherit; font-size: 1.1rem; flex-grow: 1; min-width: 0;
-            pointer-events: auto; /* 常に編集可能 */
+            pointer-events: auto;
         }
 
         .badge-wrapper { display: flex; gap: 4px; margin-right: 15px; }
@@ -121,7 +116,6 @@
         .del-group-btn { background: rgba(255, 255, 255, 0.7); border: none; border-radius: 50%; width: 30px; height: 30px; font-size: 0.9rem; font-weight: 900; color: #64748b; cursor: pointer; flex-shrink: 0; transition: 0.2s;}
         .del-group-btn:hover { background: #f43f5e; color: #fff; }
 
-        /* グループの中身（開いた時だけ表示） */
         .group-content-area { 
             display: none; flex-wrap: wrap; justify-content: center; align-items: flex-start; 
             padding: 20px 10px 35px; gap: 15px; width: 100%;
@@ -131,7 +125,6 @@
         }
         .group-row-container.open .group-content-area { display: flex; }
 
-        /* 新しい島を追加するボタン（バー形式） */
         .add-new-island { 
             width: 100%; flex-basis: 100%; min-height: 56px; margin-top: 10px;
             border-radius: var(--radius-lg); border: 2px dashed rgba(255, 255, 255, 0.6); 
@@ -142,31 +135,23 @@
         }
         .add-new-island:hover { background: rgba(255, 255, 255, 0.4); }
 
-        /* =========================================
-           ✨ タスクの丸（直置き＆グループ内共通）
-           ========================================= */
         .circle-block { 
             position: relative; box-sizing: border-box; border-radius: 50%; 
             background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6)); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; 
             box-shadow: 0 8px 20px rgba(2, 132, 199, 0.15); user-select: none; flex-shrink: 0; 
-            border: 1px solid #fff; /* グループの2pxより細い線 */
-            
-            /* ✨ PC/スマホ共通の安全な可変サイズ */
+            border: 1px solid #fff;
             width: clamp(75px, 23vw, 115px); height: clamp(75px, 23vw, 115px); 
         }
         .circle-title { font-weight: 900; line-height: 1.2; padding: 0 5%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color:#0f172a; font-size: clamp(11px, 3vw, 14px);}
 
-        /* タスクの丸の上に付くバッジ */
         .task-badge-wrapper { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 2px; z-index: 5; pointer-events: none; }
 
-        /* タスク追加用の丸 */
         .circle-block.add-btn-circle {
             border: 1px dashed rgba(15, 23, 42, 0.2); background: rgba(255, 255, 255, 0.25); box-shadow: none;
         }
         .circle-block.add-btn-circle span { font-size: clamp(20px, 5vw, 30px); color: var(--primary); font-weight: 900; opacity: 0.7; }
 
-        /* モーダル関連 */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); width: 100%; max-height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); }
@@ -191,19 +176,20 @@
         .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; color:#0f172a; outline: none; max-width: 140px;}
         .add-input { flex-grow: 1; padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f5f9; font-family: inherit; font-weight: 800; outline: none; }
         .add-btn { background: var(--primary); color: #fff; border: none; padding: 0 15px; border-radius: 10px; font-weight: 900; cursor: pointer; }
-        
-        @keyframes jelly { 0% { transform: scale(1, 1); } 30% { transform: scale(1.15, 0.85); } 40% { transform: scale(0.85, 1.15); } 50% { transform: scale(1.05, 0.95); } 65% { transform: scale(0.98, 1.02); } 75% { transform: scale(1.02, 0.98); } 100% { transform: scale(1, 1); } }
-        .jelly-anim { animation: jelly 0.6s ease; }
     </style>
 </head>
 <body>
 
-    <svg id="koi-fish" viewBox="0 0 200 400" style="position:fixed; width:80px; height:160px; pointer-events:none; z-index: 5; transform-origin: center center; opacity: 0.95;">
+    <svg id="koi-fish" viewBox="0 0 200 400" style="position:fixed; width:80px; height:160px; pointer-events:none; z-index: 5; transform-origin: center center; opacity: 0.95; filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.25));">
         <defs><radialGradient id="bodyGrad" cx="50%" cy="40%" r="60%"><stop offset="0%" stop-color="#ffffff"/><stop offset="80%" stop-color="#f1f5f9"/><stop offset="100%" stop-color="#cbd5e1"/></radialGradient></defs>
         <path id="koi-fin-tail" d="M100,280 C130,330 140,380 100,390 C60,380 70,330 100,280 Z" fill="rgba(255,255,255,0.5)" stroke="#cbd5e1" stroke-width="1"/><path id="koi-fin-tail-2" d="M100,280 C115,320 120,360 100,380 C80,360 85,320 100,280 Z" fill="rgba(255,255,255,0.8)"/>
         <path id="koi-fin-chest-l" d="M70,120 C20,130 10,180 50,200 C60,180 65,150 70,120 Z" fill="rgba(255,255,255,0.6)" stroke="#cbd5e1" stroke-width="1"/><path id="koi-fin-chest-r" d="M130,120 C180,130 190,180 150,200 C140,180 135,150 130,120 Z" fill="rgba(255,255,255,0.6)" stroke="#cbd5e1" stroke-width="1"/>
+        <path id="koi-fin-belly-l" d="M80,220 C50,240 50,270 75,260 Z" fill="rgba(255,255,255,0.6)"/><path id="koi-fin-belly-r" d="M120,220 C150,240 150,270 125,260 Z" fill="rgba(255,255,255,0.6)"/>
         <path id="koi-body" d="M100,20 C140,40 150,140 125,240 C110,290 100,300 100,300 C100,300 90,290 75,240 C50,140 60,40 100,20 Z" fill="url(#bodyGrad)"/>
-        <path id="koi-mark-red-1" d="M100,20 C120,30 130,60 110,80 C90,100 70,80 80,40 C85,25 90,20 100,20 Z" fill="#ea580c"/><path id="koi-mark-red-2" d="M130,110 C145,130 140,170 115,190 C90,180 110,140 130,110 Z" fill="#ea580c"/><circle id="koi-eye-l" cx="75" cy="55" r="4" fill="#0f172a"/><circle id="koi-eye-r" cx="125" cy="55" r="4" fill="#0f172a"/>
+        <path id="koi-mark-red-1" d="M100,20 C120,30 130,60 110,80 C90,100 70,80 80,40 C85,25 90,20 100,20 Z" fill="#ea580c"/><path id="koi-mark-red-2" d="M130,110 C145,130 140,170 115,190 C90,180 110,140 130,110 Z" fill="#ea580c"/><path id="koi-mark-red-3" d="M70,150 C90,140 100,170 85,210 C65,190 55,170 70,150 Z" fill="#ea580c"/><path id="koi-mark-red-4" d="M100,230 C120,240 115,270 100,280 C85,270 80,240 100,230 Z" fill="#ea580c"/>
+        <path id="koi-mark-black-1" d="M80,90 C95,95 90,120 75,115 C65,105 70,90 80,90 Z" fill="#1e293b"/><path id="koi-mark-black-2" d="M120,190 C135,200 125,230 110,225 C100,210 110,195 120,190 Z" fill="#1e293b"/><path id="koi-mark-black-3" d="M85,215 C95,220 90,240 80,235 C75,225 80,215 85,215 Z" fill="#1e293b"/>
+        <circle id="koi-eye-l" cx="75" cy="55" r="4" fill="#0f172a"/><circle id="koi-eye-l-iris" cx="74" cy="54" r="1.5" fill="#ffffff"/><circle id="koi-eye-r" cx="125" cy="55" r="4" fill="#0f172a"/><circle id="koi-eye-r-iris" cx="124" cy="54" r="1.5" fill="#ffffff"/>
+        <path id="koi-whisker-l" d="M85,25 Q70,10 65,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/><path id="koi-whisker-r" d="M115,25 Q130,10 135,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
     </svg>
 
     <div id="loading-screen"><div class="loader"></div><p style="margin-top:20px; font-weight:900; color:var(--primary)">Loading PM CORE...</p></div>
@@ -334,10 +320,6 @@
             const el = document.getElementById('dashboard'); el.innerHTML = '';
             const isMgr = curPD.managers.includes(user.email);
 
-            // 1. 直置きタスクの描画
-            curPD.standaloneBlocks.forEach(b => el.appendChild(createCircleDom(b, null)));
-
-            // 2. グループ（島）の描画（アコーディオンバー）
             curPD.groups.forEach(g => {
                 const isOpen = window.openGroups.has(g.id);
                 const groupEl = document.createElement('div');
@@ -356,13 +338,12 @@
                 groupEl.innerHTML = `
                     <div class="group-header-bar" onclick="if(event.target.tagName !== 'INPUT' && event.target.tagName !== 'BUTTON') window.toggleG('${g.id}')">
                         <span class="toggle-icon">▶</span>
-                        <input type="text" value="${g.title}" onblur="window.updateGN('${g.id}', this.value)" onclick="event.stopPropagation()" class="group-title">
+                        <input type="text" value="${g.title}" onblur="window.updateGN('${g.id}', this.value)" onclick="event.stopPropagation()" class="group-title" ${isOpen?'':'readonly'}>
                         <div class="badge-wrapper">${badgeHtml}</div>
                         <button class="del-group-btn" onclick="event.stopPropagation(); window.delG('${g.id}')">✕</button>
                     </div>
                     <div class="group-content-area" id="circles-${g.id}"></div>
                 `;
-                
                 if(isOpen) {
                     const container = groupEl.querySelector('.group-content-area');
                     g.blocks.forEach(b => container.appendChild(createCircleDom(b, g.id)));
@@ -375,7 +356,8 @@
                 el.appendChild(groupEl);
             });
 
-            // 直置き用の追加ボタン
+            curPD.standaloneBlocks.forEach(b => el.appendChild(createCircleDom(b, null)));
+
             const addT = document.createElement('div');
             addT.className = 'circle-block add-btn-circle';
             addT.innerHTML = '<span>＋</span>';
@@ -414,7 +396,6 @@
         }
 
         function setupSortables() {
-            // ダッシュボード全体の並び替え
             Sortable.create(document.getElementById('dashboard'), {
                 group: { name: 'dashboard', put: true, pull: true },
                 animation: 250, delay: 150, delayOnTouchOnly: true, filter: '.add-btn-circle, .add-new-island, input, button', preventOnFilter: false,
@@ -429,7 +410,6 @@
                 }
             });
 
-            // 島の中の並び替え & 海との往来
             curPD.groups.forEach(g => {
                 const container = document.getElementById(`circles-${g.id}`);
                 if(!container) return;
@@ -443,7 +423,7 @@
 
         async function moveBlock(e) {
             const blockId = e.item.dataset.id;
-            if(!blockId) return; // Addボタン等の誤作動防止
+            if(!blockId) return; 
             const fromGId = e.from.id === 'dashboard' ? null : e.from.id.replace('circles-', '');
             const toGId = e.to.id === 'dashboard' ? null : e.to.id.replace('circles-', '');
             
