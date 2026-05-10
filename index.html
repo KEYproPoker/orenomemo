@@ -231,15 +231,14 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        // GoogleAuthProviderを追加
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // ==========================================
-        // Firebase Config
+        // 修正版 Firebase Config
         // ==========================================
         const firebaseConfig = {
-            apiKey: "AIzaSyAKBwm7j4-A__682dRZKxULXeLMX-zLPKE",
+            apiKey: "AIzaSyAKBwm7j4-A__682dRZKXULXeLMX-zLPKE",
             authDomain: "pm-tasks-f9303.firebaseapp.com",
             projectId: "pm-tasks-f9303",
             storageBucket: "pm-tasks-f9303.firebasestorage.app",
@@ -263,8 +262,6 @@
         // ==========================================
         // 1. Auth & Profile Logic
         // ==========================================
-        
-        // カラーピッカーの初期化関数
         function setupColorPicker(containerId, onChangeCallback) {
             const options = document.querySelectorAll(`#${containerId} .color-option`);
             options.forEach(opt => {
@@ -282,11 +279,9 @@
         let tempEditColor = "#38bdf8";
         setupColorPicker('edit-color-picker', (c) => tempEditColor = c);
 
-        // Googleログイン処理
         window.loginWithGoogle = async () => {
             try {
                 await signInWithPopup(auth, provider);
-                // 成功後の処理は onAuthStateChanged で自動的に行われます
             } catch (error) {
                 console.error(error);
                 alert("ログインに失敗しました: " + error.message);
@@ -295,26 +290,21 @@
 
         window.logout = () => signOut(auth);
 
-        // 認証状態の監視
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 
                 if(userDoc.exists()) {
-                    // すでに登録済みのユーザー
                     myProfile = userDoc.data();
                     document.getElementById('auth-modal').style.display = 'none';
                     listenToMyProjects();
                 } else {
-                    // 新規ユーザー（初回ログイン）
                     document.getElementById('login-view').style.display = 'none';
                     document.getElementById('setup-view').style.display = 'block';
-                    // Googleから取得した名前を初期セット
                     document.getElementById('setup-name').value = user.displayName || "";
                 }
             } else {
-                // ログアウト状態
                 currentUser = null;
                 document.getElementById('login-view').style.display = 'block';
                 document.getElementById('setup-view').style.display = 'none';
@@ -324,7 +314,6 @@
             }
         });
 
-        // 初回セットアップ完了処理
         window.completeSetup = async () => {
             const name = document.getElementById('setup-name').value.trim();
             if(!name) return alert("表示名を入力してください");
@@ -332,10 +321,7 @@
             myProfile = { email: currentUser.email, name: name, color: tempSetupColor };
             
             try {
-                // Usersコレクションにプロフィールを保存
                 await setDoc(doc(db, "users", currentUser.uid), myProfile);
-                
-                // 初回用のパーソナルプロジェクトを作成
                 await addDoc(collection(db, "projects"), {
                     title: "My Personal Tasks",
                     members: [currentUser.email], 
@@ -348,7 +334,6 @@
             } catch(e) { alert("登録エラー: " + e.message); }
         };
 
-        // プロフィール編集
         window.openProfileModal = () => {
             document.getElementById('edit-name').value = myProfile.name;
             tempEditColor = myProfile.color;
@@ -367,17 +352,14 @@
             myProfile.color = tempEditColor;
             await setDoc(doc(db, "users", currentUser.uid), myProfile, {merge: true});
             window.closeModal('profile-modal');
-            loadCurrentProjectData(); // UIリフレッシュ
+            loadCurrentProjectData(); 
         };
-
 
         // ==========================================
         // 2. Project List & Sync
         // ==========================================
         function listenToMyProjects() {
-            // 自分がmembers配列に含まれるプロジェクトを監視
             const q = query(collection(db, "projects"), where("members", "array-contains", currentUser.email));
-            
             onSnapshot(q, (snapshot) => {
                 projects = [];
                 snapshot.forEach(doc => {
