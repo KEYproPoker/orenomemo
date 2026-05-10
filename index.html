@@ -148,17 +148,42 @@
 </head>
 <body>
 
-    <svg id="koi-fish" viewBox="0 0 100 120" style="position:fixed; width:40px; height:48px; pointer-events:none; z-index: 5; transform-origin: center center; opacity: 0.9;">
+    <svg id="koi-fish" viewBox="0 0 200 400" style="position:fixed; width:80px; height:160px; pointer-events:none; z-index: 5; transform-origin: center center; opacity: 0.95; filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.25));">
         <defs>
-            <linearGradient id="koiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style="stop-color:#ff7e67;stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
-            </linearGradient>
+            <radialGradient id="bodyGrad" cx="50%" cy="40%" r="60%">
+                <stop offset="0%" stop-color="#ffffff"/>
+                <stop offset="80%" stop-color="#f1f5f9"/>
+                <stop offset="100%" stop-color="#cbd5e1"/>
+            </radialGradient>
         </defs>
-        <path d="M45,35 Q15,40 25,65 Z" fill="rgba(255,255,255,0.8)"/>
-        <path d="M55,35 Q85,40 75,65 Z" fill="rgba(255,255,255,0.8)"/>
-        <path d="M50,10 C70,25 65,65 50,90 C35,65 30,25 50,10 Z" fill="url(#koiGrad)"/>
-        <path d="M50,85 C65,100 60,115 50,120 C40,115 35,100 50,85 Z" fill="rgba(255,126,103,0.9)"/>
+        
+        <path d="M100,280 C130,330 140,380 100,390 C60,380 70,330 100,280 Z" fill="rgba(255,255,255,0.5)" stroke="#cbd5e1" stroke-width="1"/>
+        <path d="M100,280 C115,320 120,360 100,380 C80,360 85,320 100,280 Z" fill="rgba(255,255,255,0.8)"/>
+        
+        <path d="M70,120 C20,130 10,180 50,200 C60,180 65,150 70,120 Z" fill="rgba(255,255,255,0.6)" stroke="#cbd5e1" stroke-width="1"/>
+        <path d="M130,120 C180,130 190,180 150,200 C140,180 135,150 130,120 Z" fill="rgba(255,255,255,0.6)" stroke="#cbd5e1" stroke-width="1"/>
+
+        <path d="M80,220 C50,240 50,270 75,260 Z" fill="rgba(255,255,255,0.6)"/>
+        <path d="M120,220 C150,240 150,270 125,260 Z" fill="rgba(255,255,255,0.6)"/>
+
+        <path d="M100,20 C140,40 150,140 125,240 C110,290 100,300 100,300 C100,300 90,290 75,240 C50,140 60,40 100,20 Z" fill="url(#bodyGrad)"/>
+
+        <path d="M100,20 C120,30 130,60 110,80 C90,100 70,80 80,40 C85,25 90,20 100,20 Z" fill="#ea580c"/>
+        <path d="M130,110 C145,130 140,170 115,190 C90,180 110,140 130,110 Z" fill="#ea580c"/>
+        <path d="M70,150 C90,140 100,170 85,210 C65,190 55,170 70,150 Z" fill="#ea580c"/>
+        <path d="M100,230 C120,240 115,270 100,280 C85,270 80,240 100,230 Z" fill="#ea580c"/>
+
+        <path d="M80,90 C95,95 90,120 75,115 C65,105 70,90 80,90 Z" fill="#1e293b"/>
+        <path d="M120,190 C135,200 125,230 110,225 C100,210 110,195 120,190 Z" fill="#1e293b"/>
+        <path d="M85,215 C95,220 90,240 80,235 C75,225 80,215 85,215 Z" fill="#1e293b"/>
+
+        <circle cx="75" cy="55" r="4" fill="#0f172a"/>
+        <circle cx="74" cy="54" r="1.5" fill="#ffffff"/>
+        <circle cx="125" cy="55" r="4" fill="#0f172a"/>
+        <circle cx="124" cy="54" r="1.5" fill="#ffffff"/>
+
+        <path d="M85,25 Q70,10 65,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+        <path d="M115,25 Q130,10 135,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
     </svg>
 
     <div id="loading-screen"><div class="loader"></div><p style="margin-top:20px; font-weight:900; color:var(--primary)">Loading PM Tasks...</p></div>
