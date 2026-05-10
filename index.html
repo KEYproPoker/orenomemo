@@ -3,18 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PM CORE - Candy Cloud Edition</title>
+    <title>PM CORE - Focused Blue Edition</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
         :root {
-            --bg-1: #fbcfe8; --bg-2: #e9d5ff; --bg-3: #bae6fd; --bg-4: #fef08a;
-            --surface: rgba(255, 255, 255, 0.8);
+            --bg-1: #ffffff; --bg-2: #f0f9ff; --bg-3: #e0f2fe; --bg-4: #bae6fd;
+            --surface: rgba(255, 255, 255, 0.85);
             --text: #312e81; --text-m: #94a3b8;
-            --primary: #8b5cf6; --radius-xl: 32px; --radius-lg: 24px;
+            --primary: #38bdf8; --radius-xl: 32px; --radius-lg: 24px;
         }
 
         @keyframes aurora { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
@@ -26,73 +27,73 @@
             display: flex; flex-direction: column; height: 100dvh; overflow: hidden; color: var(--text);
         }
 
-        /* 🍭 ローディング画面 */
         #loading-screen {
             position: fixed; inset: 0; background: #fff; z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
         }
-        .loader {
-            width: 60px; height: 60px; border: 8px solid var(--bg-1);
-            border-top: 8px solid var(--primary); border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .loader { width: 60px; height: 60px; border: 8px solid var(--bg-1); border-top: 8px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(255,255,255,0.3); backdrop-filter: blur(10px); border-bottom: 2px solid #fff; }
-        .project-select { padding: 8px 15px; border-radius: 50px; border: 2px solid #fff; font-weight: 900; font-family: inherit; color: var(--primary); background: var(--surface); cursor: pointer; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); border-bottom: 2px solid #fff; }
+        .project-select { padding: 8px 15px; border-radius: 50px; border: 2px solid #fff; font-weight: 900; font-family: inherit; color: #0284c7; background: var(--surface); cursor: pointer; outline:none; }
         
         header { padding: 15px 20px 5px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .header-titles h1 { margin: 0; font-size: 1.6rem; font-weight: 900; }
-        .header-titles p { margin: 0; font-size: 0.8rem; font-weight: 700; color: var(--primary); }
+        .header-titles h1 { margin: 0; font-size: 1.6rem; font-weight: 900; color:#0f172a;}
+        .header-titles p { margin: 0; font-size: 0.8rem; font-weight: 800; color: #0284c7; }
         
-        /* ヘッダーのアイコンボタン */
         .icon-btn { background: var(--surface); border: 2px solid #fff; color: var(--primary); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.2s; }
-        .icon-btn:hover { transform: scale(1.05); }
         .icon-btn img { width: 100%; height: 100%; object-fit: cover; }
 
         .dashboard { display: flex; flex-wrap: wrap; padding: 20px; justify-content: center; align-content: center; flex-grow: 1; overflow: hidden; gap: 15px;}
         .circle-block { 
-            position: relative; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.5)); 
+            position: relative; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6)); 
             border: 4px solid #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
             cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.05); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .circle-block:active { transform: scale(0.9); }
-        .circle-title { font-weight: 900; line-height: 1.2; padding: 0 10%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+        .circle-title { font-weight: 900; line-height: 1.2; padding: 0 10%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color:#0f172a;}
         .circle-creator { font-size: 0.6rem; font-weight: 800; margin-top: 4px; opacity: 0.7; }
         .badge { position: absolute; top: 0; right: 0; transform: translate(15%, -15%); color: #fff; font-weight: 900; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid #fff; z-index: 2; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.25); backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
         .modal-overlay.active { display: flex; }
         .modal-content { background: #fff; width: 100%; max-height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        
+        @media (min-width: 600px) { 
+            .modal-overlay { align-items: center; } 
+            .modal-content { width: 450px; border-radius: var(--radius-xl); animation: fadeInScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); } 
+        }
+        
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-        @media (min-width: 600px) { .modal-content { width: 450px; border-radius: var(--radius-xl); margin-bottom: 5vh; } }
+        @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         .modal-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .modal-title-input { font-family: inherit; border: none; font-size: 1.5rem; font-weight: 900; width: 100%; outline: none; }
-        .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: 900; cursor: pointer; }
+        .modal-title-input { font-family: inherit; border: none; font-size: 1.5rem; font-weight: 900; width: 100%; outline: none; color:#0f172a;}
+        .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: 900; cursor: pointer; color:var(--text-m);}
 
         .task-list { padding: 0 24px; overflow-y: auto; flex-grow: 1; }
         .task-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; background: #f8fafc; border-radius: var(--radius-lg); border: 2px solid #f1f5f9; }
+        .drag-handle { cursor: grab; padding: 5px; margin-right: 10px; color: #cbd5e1; font-size: 1.2rem; user-select: none; }
+
         .task-checkbox { appearance: none; width: 22px; height: 22px; border-radius: 6px; border: 3px solid #cbd5e1; margin-right: 12px; cursor: pointer; position: relative; }
         .task-checkbox:checked { background: var(--primary); border-color: var(--primary); }
         .task-checkbox:checked::after { content: '✔'; position: absolute; inset: 0; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; }
-        .task-text { font-family: inherit; font-weight: 700; flex-grow: 1; outline: none; }
+        .task-content { flex-grow: 1; display: flex; flex-direction: column; }
+        .task-text { font-family: inherit; font-weight: 700; outline: none; color:#0f172a;}
         .task-item.completed .task-text { text-decoration: line-through; opacity: 0.5; }
         .task-tag { font-size: 0.6rem; font-weight: 900; padding: 2px 8px; border-radius: 10px; color: #fff; margin-top: 4px; display: inline-block; }
 
         .add-area { padding: 20px 24px; display: flex; gap: 8px; border-top: 2px dashed #f1f5f9; }
-        .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; }
+        .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; color:#0f172a;}
         .add-input { flex-grow: 1; padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f5f9; font-family: inherit; font-weight: 800; outline: none; }
         .add-btn { background: var(--primary); color: #fff; border: none; padding: 0 15px; border-radius: 10px; font-weight: 900; cursor: pointer; }
 
         .auth-overlay { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center; }
         .auth-card { padding: 40px; width: 85%; max-width: 320px; }
         .google-login { width: 100%; padding: 15px; border-radius: 50px; border: 2px solid #f1f5f9; background: #fff; font-weight: 900; font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .color-opt { width: 35px; height: 35px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; transition: 0.2s; }
-        .color-opt.selected { transform: scale(1.2); border-color: #312e81; }
+        .color-opt { width: 35px; height: 35px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .color-opt.selected { transform: scale(1.2); border-color: #0f172a; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
 
-        /* 画像アップロード用アイコンスタイル */
         .profile-img-btn { position: relative; width: 80px; height: 80px; border-radius: 50%; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin: 0 auto 20px; cursor: pointer; overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center;}
         .profile-img-btn img { width: 100%; height: 100%; object-fit: cover; }
         .profile-img-btn::after { content: '📷'; position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.4); color: #fff; font-size: 0.8rem; padding: 4px 0; text-align: center; }
@@ -105,18 +106,12 @@
 
     <div id="auth-screen" class="auth-overlay" style="display:none;">
         <div class="auth-card" id="login-v">
-            <h2 style="font-weight:900; font-size:2rem;">PM Tasks</h2>
-            <p style="color:var(--text-m); font-weight:800; margin-bottom:30px;">Login to Sync</p>
+            <h2 style="font-weight:900; font-size:2rem; color:#0f172a;">PM Tasks</h2>
             <button class="google-login" onclick="window.login()">Googleでログイン</button>
         </div>
         <div class="auth-card" id="setup-v" style="display:none;">
-            <h2 style="font-weight:900;">Profile Setup</h2>
-            
-            <label class="profile-img-btn">
-                <img id="setup-img" src="" alt="icon">
-                <input type="file" accept="image/*" onchange="window.handleImageUpload(event, 'setup-img')">
-            </label>
-
+            <h2 style="font-weight:900; color:#0f172a;">Profile Setup</h2>
+            <label class="profile-img-btn"><img id="setup-img" src="" alt="icon"><input type="file" accept="image/*" onchange="window.handleImageUpload(event, 'setup-img')"></label>
             <input type="text" id="setup-n" style="width:100%; padding:12px; border-radius:10px; border:2px solid #f1f5f9; margin-bottom:20px; text-align:center; font-family:inherit; font-weight:800;" placeholder="なまえ">
             <div id="setup-colors" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:30px;"></div>
             <button class="google-login" style="background:var(--primary); color:#fff;" onclick="window.finishSetup()">スタート！</button>
@@ -126,12 +121,7 @@
     <div id="profile-m" class="modal-overlay" onclick="if(event.target==this)window.closeM('profile-m')">
         <div class="modal-content" style="padding:30px; height:auto; text-align:center;">
             <h2 style="margin:0 0 20px; font-weight:900;">プロフィール編集</h2>
-            
-            <label class="profile-img-btn">
-                <img id="edit-img" src="" alt="icon">
-                <input type="file" accept="image/*" onchange="window.handleImageUpload(event, 'edit-img')">
-            </label>
-
+            <label class="profile-img-btn"><img id="edit-img" src="" alt="icon"><input type="file" accept="image/*" onchange="window.handleImageUpload(event, 'edit-img')"></label>
             <input type="text" id="edit-n" class="add-input" style="width:100%; box-sizing:border-box; margin-bottom:20px; text-align:center;" placeholder="表示名">
             <div id="edit-colors" style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:30px;"></div>
             <button class="add-btn" style="width:100%; padding:15px;" onclick="window.saveProfile()">保存する</button>
@@ -141,17 +131,15 @@
     <div class="top-bar">
         <select id="proj-sel" class="project-select" onchange="window.switchProj()"></select>
         <div style="display:flex; gap:8px;">
-            <button class="add-btn" style="padding:8px 12px; font-size:0.7rem;" onclick="window.openM('invite-m')">招待</button>
-            <button class="add-btn" style="padding:8px 12px; font-size:0.7rem; background:#34d399;" onclick="window.openM('new-p-m')">新規PJ</button>
+            <button class="add-btn" style="padding:8px 12px; font-size:0.75rem; background:#8b5cf6;" onclick="window.openM('invite-m')">招待</button>
+            <button class="add-btn" style="padding:8px 12px; font-size:0.75rem; background:#34d399;" onclick="window.openM('new-p-m')">＋ 新規PJ</button>
         </div>
     </div>
 
     <header>
         <div class="header-titles"><h1 id="header-pj-name">Workspace</h1><p id="mem-count">Members: -</p></div>
         <div style="display:flex; gap:10px;">
-            <button class="icon-btn" onclick="window.openProfile()" title="プロフィール設定">
-                <img id="header-user-icon" src="" alt="👤">
-            </button>
+            <button class="icon-btn" onclick="window.openProfile()"><img id="header-user-icon" src="" alt="👤"></button>
             <button class="icon-btn" onclick="window.logout()">🚪</button>
         </div>
     </header>
@@ -160,22 +148,15 @@
 
     <div id="modal" class="modal-overlay" onclick="if(event.target==this)window.closeM('modal')">
         <div class="modal-content">
-            <div class="modal-header">
-                <input type="text" id="m-title" class="modal-title-input" onblur="window.saveName()">
-                <button class="close-btn" onclick="window.closeM('modal')">✕</button>
-            </div>
+            <div class="modal-header"><input type="text" id="m-title" class="modal-title-input" onblur="window.saveName()"><button class="close-btn" onclick="window.closeM('modal')">✕</button></div>
             <div id="task-list" class="task-list"></div>
-            <div class="add-area">
-                <select id="ass-sel" class="assign-sel"></select>
-                <input type="text" id="t-input" class="add-input" placeholder="タスクを追加..." onkeypress="if(event.key=='Enter')window.addTask()">
-                <button class="add-btn" onclick="window.addTask()">追加</button>
-            </div>
+            <div class="add-area"><select id="ass-sel" class="assign-sel"></select><input type="text" id="t-input" class="add-input" placeholder="タスクを追加..."><button class="add-btn" onclick="window.addTask()">追加</button></div>
             <button style="color:#f43f5e; border:none; background:none; padding:15px; font-weight:900; cursor:pointer;" onclick="window.delBlock()">🗑 このカテゴリを削除</button>
         </div>
     </div>
 
-    <div id="new-p-m" class="modal-overlay" onclick="if(event.target==this)window.closeM('new-p-m')"><div class="modal-content" style="padding:30px; height:auto;"><h2 style="margin:0 0 20px;">新規PJ作成</h2><input type="text" id="new-p-t" class="add-input" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="PJ名"><button class="add-btn" style="width:100%; padding:15px;" onclick="window.createPJ()">作成</button></div></div>
-    <div id="invite-m" class="modal-overlay" onclick="if(event.target==this)window.closeM('invite-m')"><div class="modal-content" style="padding:30px; height:auto;"><h2 style="margin:0 0 10px;">招待</h2><p style="font-size:0.8rem; margin-bottom:20px;">相手のGmailアドレスを入力</p><input type="email" id="inv-e" class="add-input" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="email@gmail.com"><button class="add-btn" style="width:100%; padding:15px;" onclick="window.sendInv()">招待</button></div></div>
+    <div id="new-p-m" class="modal-overlay" onclick="if(event.target==this)window.closeM('new-p-m')"><div class="modal-content" style="padding:30px; height:auto;"><h2>新規PJ作成</h2><input type="text" id="new-p-t" class="add-input" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="PJ名"><button class="add-btn" style="width:100%; padding:15px; background:#34d399;" onclick="window.createPJ()">作成</button></div></div>
+    <div id="invite-m" class="modal-overlay" onclick="if(event.target==this)window.closeM('invite-m')"><div class="modal-content" style="padding:30px; height:auto;"><h2>招待</h2><input type="email" id="inv-e" class="add-input" style="width:100%; box-sizing:border-box; margin-bottom:20px;" placeholder="email@gmail.com"><button class="add-btn" style="width:100%; padding:15px; background:#8b5cf6;" onclick="window.sendInv()">招待を送る</button></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -197,61 +178,15 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        let user = null, myP = null, pjs = [], curPId = null, curPD = null, curBId = null;
-        let tempPhoto = ""; // 一時保存用の画像Base64データ
-        
+        let user = null, myP = null, pjs = [], curPId = null, curPD = null, curBId = null, tempPhoto = "";
         const colors = ["#38bdf8", "#fb7185", "#34d399", "#fbbf24", "#a78bfa", "#f472b6", "#fb923c", "#0f172a"];
         let selC = colors[0];
 
-        // カラーピッカー生成
-        function buildColors(containerId) {
-            const ctn = document.getElementById(containerId); ctn.innerHTML = '';
-            colors.forEach(c => {
-                const dv = document.createElement('div'); dv.className = 'color-opt'; dv.style.background = c;
-                if(c == selC) dv.classList.add('selected');
-                dv.onclick = () => { ctn.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected')); dv.classList.add('selected'); selC = c; };
-                ctn.appendChild(dv);
-            });
-        }
-
-        // 🖼️ スマホの画像を100x100に圧縮して文字データにする裏技
-        window.handleImageUpload = (event, imgId) => {
-            const file = event.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const size = 150; // リサイズ
-                    canvas.width = size; canvas.height = size;
-                    const ctx = canvas.getContext('2d');
-                    // 中央を切り抜く
-                    const minSize = Math.min(img.width, img.height);
-                    const sx = (img.width - minSize) / 2;
-                    const sy = (img.height - minSize) / 2;
-                    ctx.drawImage(img, sx, sy, minSize, minSize, 0, 0, size, size);
-                    // JPEG圧縮してBase64化
-                    tempPhoto = canvas.toDataURL('image/jpeg', 0.8);
-                    document.getElementById(imgId).src = tempPhoto;
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        };
-
-        // 🚀 ロジック開始
         onAuthStateChanged(auth, async (u) => {
             if (u) {
                 user = u;
                 const d = await getDoc(doc(db, "users", u.uid));
-                if (d.exists()) {
-                    myP = d.data();
-                    updateHeaderIcon();
-                    loadPJs();
-                } else {
-                    showSetup();
-                }
+                if (d.exists()) { myP = d.data(); updateHeaderIcon(); loadPJs(); } else { showSetup(); }
             } else {
                 document.getElementById('auth-screen').style.display = 'flex';
                 document.getElementById('login-v').style.display = 'block';
@@ -267,47 +202,37 @@
             document.getElementById('auth-screen').style.display = 'flex';
             document.getElementById('login-v').style.display = 'none';
             document.getElementById('setup-v').style.display = 'block';
-            
             document.getElementById('setup-n').value = user.displayName;
-            tempPhoto = user.photoURL || ""; // 初期値はGoogleの画像
+            tempPhoto = user.photoURL || "";
             document.getElementById('setup-img').src = tempPhoto;
-            
-            buildColors('setup-colors');
-            hideLoading();
+            buildColors('setup-colors'); hideLoading();
         }
 
         window.finishSetup = async () => {
             const name = document.getElementById('setup-n').value;
             if(!name) return alert("名前を入力してね");
             myP = { email: user.email, name, color: selC, photo: tempPhoto };
-            
             await setDoc(doc(db, "users", user.uid), myP);
             await addDoc(collection(db, "projects"), { title: "My Tasks", members: [user.email], blocks: [] });
             location.reload();
         };
 
-        // プロフィール編集画面
         window.openProfile = () => {
             document.getElementById('edit-n').value = myP.name;
-            selC = myP.color || colors[0];
-            tempPhoto = myP.photo || user.photoURL || "";
+            selC = myP.color || colors[0]; tempPhoto = myP.photo || "";
             document.getElementById('edit-img').src = tempPhoto;
-            buildColors('edit-colors');
-            window.openM('profile-m');
+            buildColors('edit-colors'); window.openM('profile-m');
         };
 
         window.saveProfile = async () => {
-            const name = document.getElementById('edit-n').value;
-            if(!name) return;
+            const name = document.getElementById('edit-n').value; if(!name) return;
             myP.name = name; myP.color = selC; myP.photo = tempPhoto;
             await setDoc(doc(db, "users", user.uid), myP, {merge: true});
-            updateHeaderIcon();
-            window.closeM('profile-m');
+            updateHeaderIcon(); window.closeM('profile-m');
         };
 
         function updateHeaderIcon() {
-            const iconUrl = myP.photo || user.photoURL || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%238b5cf6' viewBox='0 0 24 24'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
-            document.getElementById('header-user-icon').src = iconUrl;
+            document.getElementById('header-user-icon').src = myP.photo || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='%2338bdf8' viewBox='0 0 24 24'><path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/></svg>";
         }
 
         function loadPJs() {
@@ -316,19 +241,16 @@
                 pjs = sn.docs.map(d => ({ id: d.id, data: d.data() }));
                 updateProjList();
                 if(!curPId && pjs.length) curPId = pjs[0].id;
-                syncCurPJ();
-                hideLoading();
+                syncCurPJ(); hideLoading();
             });
         }
 
         function syncCurPJ() {
-            const p = pjs.find(x => x.id == curPId);
-            if(!p) return;
+            const p = pjs.find(x => x.id == curPId); if(!p) return;
             curPD = p.data;
             document.getElementById('header-pj-name').innerText = curPD.title;
             document.getElementById('mem-count').innerText = "Members: " + curPD.members.length;
-            renderDash();
-            updateAssList();
+            renderDash(); updateAssList();
             if(curBId) renderTasks();
         }
 
@@ -337,30 +259,32 @@
             const w = el.clientWidth - 40, h = el.clientHeight - 40;
             const blks = curPD.blocks || [], total = blks.length + 1;
             let opt = 0;
-            for(let c=1; c<=total; c++) {
-                let r = Math.ceil(total/c);
-                let s = Math.min((w-(c-1)*15)/c, (h-(r-1)*15)/r);
-                if(s > opt) opt = s;
-            }
+            for(let c=1; c<=total; c++) { let r = Math.ceil(total/c); let s = Math.min((w-(c-1)*15)/c, (h-(r-1)*15)/r); if(s > opt) opt = s; }
             const size = Math.min(Math.max(opt, 80), 150);
             blks.forEach(b => {
                 const div = document.createElement('div'); div.className = 'circle-block';
                 div.style.width = div.style.height = size + 'px'; div.style.borderColor = b.color;
                 div.onclick = () => window.openTaskM(b.id);
-                div.innerHTML = `<div class="circle-title" style="font-size:${size*0.15}px">${b.title}</div><div class="circle-creator">by ${b.userName}</div>`;
-                const uc = (b.items || []).filter(i=>!i.completed).length;
+                div.innerHTML = `<div class="circle-title" style="font-size:${size*0.15}px">${b.title}</div><div class="circle-creator" style="color:${b.color}">by ${b.userName}</div>`;
+                
+                // ✨ 修正ポイント：自分宛の未完了タスクのみカウント
+                const myUncompletedTasks = (b.items || []).filter(i => 
+                    !i.completed && (i.assEmail === user.email || i.assName === user.email.split('@')[0])
+                );
+                const uc = myUncompletedTasks.length;
+
                 if(uc > 0) {
-                    const bg = document.createElement('div'); badgeStyle(bg, size);
+                    const bg = document.createElement('div'); bg.className='badge';
+                    bg.style.width = bg.style.height = Math.max(25, size*0.3)+'px';
+                    bg.style.fontSize = Math.max(12, size*0.15)+'px';
                     bg.innerText = uc; bg.style.background = b.color; div.appendChild(bg);
                 }
                 el.appendChild(div);
             });
             const add = document.createElement('div'); add.className = 'circle-block'; add.style.width = add.style.height = size + 'px';
-            add.style.borderStyle = 'dashed'; add.innerHTML = `<span style="font-size:2rem; color:var(--primary)">＋</span>`;
+            add.style.borderStyle = 'dashed'; add.innerHTML = `<span style="font-size:2.5rem; color:var(--primary)">＋</span>`;
             add.onclick = window.addBlock; el.appendChild(add);
         }
-
-        function badgeStyle(el, s) { el.className='badge'; el.style.width = el.style.height = Math.max(25, s*0.3)+'px'; el.style.fontSize = Math.max(12, s*0.15)+'px'; }
 
         window.openTaskM = (id) => {
             curBId = id; const b = curPD.blocks.find(x=>x.id==id);
@@ -371,14 +295,19 @@
 
         function renderTasks() {
             const b = curPD.blocks.find(x=>x.id==curBId);
-            const list = document.getElementById('task-list'); list.innerHTML = '';
-            (b.items || []).forEach(i => {
-                const div = document.createElement('div'); div.className = 'task-item ' + (i.completed?'completed':'');
-                div.innerHTML = `<input type="checkbox" class="task-checkbox" ${i.completed?'checked':''} onchange="window.toggleT('${i.id}')">
-                                 <div class="task-content"><div class="task-text">${i.text}</div><span class="task-tag" style="background:${i.assColor}">${i.assName}</span></div>
-                                 <button style="border:none; background:none; cursor:pointer;" onclick="window.delT('${i.id}')">✕</button>`;
-                list.appendChild(div);
+            const container = document.getElementById('task-list'); container.innerHTML = '';
+            if(!b.items) b.items = [];
+            b.items.forEach(item => {
+                const div = document.createElement('div'); div.className = `task-item ${item.completed ? 'completed' : ''}`;
+                div.innerHTML = `<div class="drag-handle">≡</div>
+                                 <input type="checkbox" class="task-checkbox" ${item.completed?'checked':''} onchange="window.toggleT('${item.id}')">
+                                 <div class="task-content"><div class="task-text" contenteditable="true" onblur="window.editT('${item.id}', this.innerText)">${item.text}</div>
+                                 <span class="task-tag" style="background:${item.assColor || '#94a3b8'}">${item.assName}</span></div>
+                                 <button style="border:none; background:none; cursor:pointer; font-size:1.2rem; color:#cbd5e1;" onclick="window.delT('${item.id}')">✕</button>`;
+                container.appendChild(div);
             });
+            if(window.taskSortable) window.taskSortable.destroy();
+            window.taskSortable = Sortable.create(container, { animation: 150, handle: '.drag-handle', onEnd: async (e) => { const moved = b.items.splice(e.oldIndex, 1)[0]; b.items.splice(e.newIndex, 0, moved); await save(); } });
         }
 
         window.addTask = async () => {
@@ -386,65 +315,43 @@
             const assE = document.getElementById('ass-sel').value;
             const b = curPD.blocks.find(x=>x.id==curBId);
             if(!b.items) b.items = [];
-            b.items.push({ id: Date.now().toString(), text, completed: false, assName: assE.split('@')[0], assColor: (assE==user.email?myP.color:'#94a3b8') });
+            // ✨ 追加：assEmailを保存するように変更
+            b.items.push({ 
+                id: Date.now().toString(), text, completed: false, 
+                assName: assE.split('@')[0], 
+                assEmail: assE,
+                assColor: (assE==user.email?myP.color:'#94a3b8') 
+            });
             input.value = ''; await save();
         };
 
-        window.toggleT = async (tid) => {
-            const b = curPD.blocks.find(x=>x.id==curBId);
-            const i = b.items.find(x=>x.id==tid); i.completed = !i.completed; await save();
-        };
+        window.toggleT = async (tid) => { const b = curPD.blocks.find(x=>x.id==curBId); const i = b.items.find(x=>x.id==tid); i.completed = !i.completed; await save(); };
+        window.editT = async (tid, txt) => { const b = curPD.blocks.find(x=>x.id==curBId); const i = b.items.find(x=>x.id==tid); if(i.text != txt){ i.text = txt; await save(); } };
+        window.delT = async (tid) => { const b = curPD.blocks.find(x=>x.id==curBId); b.items = b.items.filter(x=>x.id!=tid); await save(); };
+        window.saveName = async () => { const b = curPD.blocks.find(x=>x.id==curBId); const val = document.getElementById('m-title').value; if(b.title != val) { b.title = val; await save(); } };
+        window.addBlock = async () => { const id = Date.now().toString(); curPD.blocks.push({ id, title: "New", userName: myP.name, color: myP.color, items: [] }); await save(); window.openTaskM(id); };
+        window.delBlock = async () => { if(!confirm("削除しますか？")) return; curPD.blocks = curPD.blocks.filter(x=>x.id != curBId); await save(); window.closeM('modal'); };
 
-        window.delT = async (tid) => {
-            const b = curPD.blocks.find(x=>x.id==curBId);
-            b.items = b.items.filter(x=>x.id!=tid); await save();
-        };
-
-        window.saveName = async () => {
-            const b = curPD.blocks.find(x=>x.id==curBId);
-            const val = document.getElementById('m-title').value;
-            if(b.title != val) { b.title = val; await save(); }
-        };
-
-        window.addBlock = async () => {
-            const id = Date.now().toString();
-            curPD.blocks.push({ id, title: "New", userName: myP.name, color: myP.color, items: [] });
-            await save(); window.openTaskM(id);
-        };
-
-        window.delBlock = async () => {
-            if(!confirm("削除しますか？")) return;
-            curPD.blocks = curPD.blocks.filter(x=>x.id != curBId);
-            await save(); window.closeM('modal');
-        };
-
-        // プロジェクト操作
-        window.createPJ = async () => {
-            const t = document.getElementById('new-p-t').value; if(!t) return;
-            await addDoc(collection(db, "projects"), { title: t, members: [user.email], blocks: [] });
-            window.closeM('new-p-m');
-        };
-
-        window.sendInv = async () => {
-            const e = document.getElementById('inv-e').value; if(!e) return;
-            if(!curPD.members.includes(e)) { curPD.members.push(e); await save(); alert("招待しました"); }
-            window.closeM('invite-m');
-        };
-
+        window.createPJ = async () => { const t = document.getElementById('new-p-t').value; if(!t) return; await addDoc(collection(db, "projects"), { title: t, members: [user.email], blocks: [] }); window.closeM('new-p-m'); };
+        window.sendInv = async () => { const e = document.getElementById('inv-e').value; if(!e) return; if(!curPD.members.includes(e)) { curPD.members.push(e); await save(); alert("招待しました"); } window.closeM('invite-m'); };
         window.switchProj = () => { curPId = document.getElementById('proj-sel').value; syncCurPJ(); };
 
-        // 共通ツール
+        window.handleImageUpload = (event, imgId) => {
+            const file = event.target.files[0]; if(!file) return;
+            const reader = new FileReader(); reader.onload = (e) => {
+                const img = new Image(); img.onload = () => {
+                    const canvas = document.createElement('canvas'); const size = 150; canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d'); const min = Math.min(img.width, img.height);
+                    ctx.drawImage(img, (img.width-min)/2, (img.height-min)/2, min, min, 0, 0, size, size);
+                    tempPhoto = canvas.toDataURL('image/jpeg', 0.8); document.getElementById(imgId).src = tempPhoto;
+                }; img.src = e.target.result;
+            }; reader.readAsDataURL(file);
+        };
+
         async function save() { await setDoc(doc(db, "projects", curPId), curPD); }
-        function updateProjList() {
-            const sel = document.getElementById('proj-sel'); sel.innerHTML = '';
-            pjs.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.innerText = p.data.title; sel.appendChild(o); });
-            sel.value = curPId;
-        }
-        function updateAssList() {
-            const sel = document.getElementById('ass-sel'); sel.innerHTML = '';
-            curPD.members.forEach(m => { const o = document.createElement('option'); o.value = m; o.innerText = m.split('@')[0]; sel.appendChild(o); });
-            sel.value = user.email;
-        }
+        function buildColors(id) { const ctn = document.getElementById(id); ctn.innerHTML = ''; colors.forEach(c => { const dv = document.createElement('div'); dv.className = 'color-opt'; dv.style.background = c; if(c == selC) dv.classList.add('selected'); dv.onclick = () => { ctn.querySelectorAll('.color-opt').forEach(x=>x.classList.remove('selected')); dv.classList.add('selected'); selC = c; }; ctn.appendChild(dv); }); }
+        function updateProjList() { const sel = document.getElementById('proj-sel'); sel.innerHTML = ''; pjs.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.innerText = p.data.title; sel.appendChild(o); }); sel.value = curPId; }
+        function updateAssList() { const sel = document.getElementById('ass-sel'); sel.innerHTML = ''; curPD.members.forEach(m => { const o = document.createElement('option'); o.value = m; o.innerText = m.split('@')[0]; sel.appendChild(o); }); sel.value = user.email; }
         window.openM = (id) => document.getElementById(id).classList.add('active');
         window.closeM = (id) => { document.getElementById(id).classList.remove('active'); if(id=='modal') curBId=null; };
         function hideLoading() { document.getElementById('loading-screen').style.opacity = '0'; setTimeout(() => document.getElementById('loading-screen').style.display='none', 500); }
