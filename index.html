@@ -36,15 +36,20 @@
             background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
         }
 
-        /* ✨ リアルな波紋シミュレーション（ゆっくり大きく広がるように調整） */
+        /* ✨ リアルな波紋シミュレーション（物理学的なエネルギー減衰と光の屈折を表現） */
         .ripple {
-            position: fixed; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.6);
-            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
-            animation: rippleAnim 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            position: fixed; border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            /* 表面張力と波の頂点による光の反射・屈折を表現 */
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.4), inset 0 0 10px rgba(255, 255, 255, 0.2);
+            transform: scale(0); pointer-events: none; z-index: 9999;
+            /* 距離の逆二乗則に近い減衰と、水の粘性を加味したイージング */
+            animation: rippleAnim cubic-bezier(0.1, 0.4, 0.4, 1) forwards;
         }
         @keyframes rippleAnim {
-            0% { width: 0; height: 0; opacity: 0.8; border-width: 4px; }
-            100% { width: 180px; height: 180px; opacity: 0; border-width: 1px; }
+            0% { transform: scale(0); opacity: 1; border-width: 5px; }
+            40% { opacity: 0.6; border-width: 2px; }
+            100% { transform: scale(1); opacity: 0; border-width: 0px; }
         }
 
         /* ✨ タスク完了担当者に応じた色の小さな餌（円） */
@@ -276,18 +281,33 @@
         const colors = ["#38bdf8", "#fb7185", "#34d399", "#fbbf24", "#a78bfa", "#f472b6", "#fb923c", "#0f172a"];
         let selC = colors[0];
 
-        // ✨ 複数の波紋を時間差で発生させる関数
+        // ✨ 流体力学的な波の伝播と分散を模した、リアルでランダムな波紋生成関数
         function spawnRipple(x, y) {
-            const numRings = 3; // 波紋の輪の数
+            // 波紋の輪の数をランダムに（2〜5個）
+            const numRings = Math.floor(Math.random() * 4) + 2; 
+            
             for (let i = 0; i < numRings; i++) {
+                // 波の発生間隔にランダムな揺らぎを加える（位相速度と群速度の違いによる波束の分散を表現）
+                const delay = i * (200 + Math.random() * 150); 
+                
                 setTimeout(() => {
                     const ripple = document.createElement('div');
                     ripple.className = 'ripple';
                     ripple.style.left = x + 'px';
                     ripple.style.top = y + 'px';
+                    
+                    // エネルギーの減衰（広がるほど薄くなる）と波長のばらつき
+                    const baseSize = 120 + Math.random() * 150; // 最大到達サイズ（120px〜270px）
+                    const duration = 1.5 + Math.random() * 1.5;   // 伝播時間（1.5s〜3.0s）
+                    
+                    ripple.style.width = baseSize + 'px';
+                    ripple.style.height = baseSize + 'px';
+                    ripple.style.margin = `-${baseSize / 2}px 0 0 -${baseSize / 2}px`; // 中心合わせ
+                    ripple.style.animationDuration = duration + 's';
+                    
                     document.body.appendChild(ripple);
-                    setTimeout(() => ripple.remove(), 1500); // アニメーション終了後に削除
-                }, i * 250); // 250msの間隔をあけて輪を発生させる
+                    setTimeout(() => ripple.remove(), duration * 1000); 
+                }, delay);
             }
         }
 
