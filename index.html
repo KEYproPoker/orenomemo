@@ -17,6 +17,10 @@
             --text: #0f172a; --text-m: #64748b;
             --primary: #0ea5e9; 
             --radius-xl: 32px; --radius-lg: 24px;
+            /* ✨ 南国風の色を追加 */
+            --coral: #ff7f50;
+            --turquoise: #40e0d0;
+            --gold: #ffd700;
         }
 
         * { -webkit-tap-highlight-color: transparent; }
@@ -66,12 +70,17 @@
 
         .dashboard { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; flex-grow: 1; overflow-y: auto; z-index: 20; }
         
-        /* ✨ 新UI：アコーディオン型の島（Glass パネル） */
+        /* ✨ 新UI：アコーディオン型の島（Glass パネル）を南国風に */
         .glass-panel {
             background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-lg); 
             display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             box-sizing: border-box; width: 100%; max-width: 800px; transition: all 0.3s ease;
+            /* ✨ 島の形を不規則に。SVG画像を使用 */
+            /* ✨ 背景画像として南国のイラストを設定。image_10.pngのビーチ、ヤシの木、植物をイメージ。 */
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" fill="rgba(255, 255, 255, 0.1)"/><path d="M100,50 C150,0 250,0 300,50 C350,100 350,200 300,250 C250,300 150,300 100,250 C50,200 50,100 100,50 Z" fill="rgba(255, 255, 255, 0.2)" stroke="rgba(255, 255, 255, 0.3)" stroke-width="2"/><ellipse cx="150" cy="100" rx="30" ry="20" fill="rgba(255, 255, 255, 0.3)"/></svg>');
+            background-size: cover;
+            background-position: center;
         }
         .panel-header { 
             display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; cursor: pointer; 
@@ -85,7 +94,13 @@
         .panel-circles { display: none; flex-wrap: wrap; justify-content: center; align-items: center; padding: 25px 20px 35px; }
         .glass-panel.open .panel-circles { display: flex; }
         
-        .add-new-group { cursor: pointer; border: 2px dashed rgba(255, 255, 255, 0.6); justify-content: center; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.15); border-radius: var(--radius-lg); width: 100%; max-width: 800px; text-align:center; font-weight:900; color:var(--primary); font-size: 1.1rem;}
+        /* ✨ 修正後：追加ボタンをビーチサンダルのイメージに */
+        .add-new-group { cursor: pointer; border: 2px dashed rgba(255, 255, 255, 0.3); justify-content: center; align-items: center; padding: 15px; background: rgba(255, 255, 255, 0.15); border-radius: var(--radius-lg); width: 100%; max-width: 800px; text-align:center; font-weight:900; color:var(--primary); font-size: 1.1rem;
+            /* ✨ ビーチサンダルの形をSVGで表現 */
+            background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg"><path d="M100,50 L200,50 L200,100 L100,100 Z M150,50 L150,100 Z" fill="none" stroke="rgba(15, 23, 42, 0.15)" stroke-width="2"/></svg>');
+            background-size: cover;
+            background-position: center;
+        }
 
         .circle-block { position: relative; box-sizing: border-box; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.4)); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15); user-select: none; -webkit-user-select: none; flex-shrink: 0; }
         .circle-title { font-weight: 900; line-height: 1.2; padding: 0 10%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color:#0f172a;}
@@ -125,6 +140,9 @@
         .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; color:#0f172a; outline: none; max-width: 140px;}
         .add-input { flex-grow: 1; padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f5f9; font-family: inherit; font-weight: 800; outline: none; }
         .add-btn { background: var(--primary); color: #fff; border: none; padding: 0 15px; border-radius: 10px; font-weight: 900; cursor: pointer; }
+
+        /* ✨ 修正後：ボタンの色を南国風の色（コーラル）に変更 */
+        .add-btn { background: var(--coral); color: #fff; border: none; padding: 0 15px; border-radius: 10px; font-weight: 900; cursor: pointer; }
 
         .auth-overlay { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; align-items: center; justify-content: center; text-align: center; }
         .auth-card { padding: 40px; width: 85%; max-width: 320px; }
