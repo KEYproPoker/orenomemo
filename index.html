@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PM CORE - Team Color Edition</title>
+    <title>PM CORE - Google Auth Edition</title>
     <style>
         /* =========================================
            CSS Variables & Base Styles
@@ -24,141 +24,220 @@
             margin: 0; padding: 0; color: var(--text-body);
             background: linear-gradient(-45deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3), var(--bg-gradient-1));
             background-size: 300% 300%; animation: softSky 20s ease-in-out infinite;
-            display: flex; flex-direction: column; height: 100dvh; 
+            display: flex; flex-direction: column; height: 100vh; height: 100dvh; 
             -webkit-font-smoothing: antialiased; overflow: hidden; overscroll-behavior-y: none;
         }
 
         /* =========================================
-           Member Bar (New)
+           Header & Project Bar
         ========================================= */
-        .member-bar {
-            display: flex; gap: 8px; padding: 10px 24px 0; overflow-x: auto; flex-shrink: 0;
-        }
-        .member-bar::-webkit-scrollbar { display: none; }
-        .member-chip {
-            padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 800;
-            background: var(--surface-white); border: 1px solid var(--border-soft);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); white-space: nowrap;
-        }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 8px 24px; background: rgba(255,255,255,0.4); border-bottom: 1px solid var(--border-soft); }
+        .project-select { padding: 6px 12px; border-radius: 8px; border: 1px solid #bae6fd; font-weight: 800; color: #0284c7; outline: none; background: #fff; cursor: pointer; max-width: 200px; }
+        .top-bar-actions { display: flex; gap: 8px; }
+        .action-btn { padding: 6px 12px; border-radius: 8px; border: none; font-size: 0.8rem; font-weight: bold; cursor: pointer; color: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-new-proj { background: #34d399; }
+        .btn-invite { background: #8b5cf6; }
 
-        /* =========================================
-           Header
-        ========================================= */
         header { padding: 15px 24px 10px; z-index: 10; display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; }
         .header-titles h1 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #0284c7; letter-spacing: 0.5px; }
         .header-titles p { margin: 2px 0 0; font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+        .header-buttons { display: flex; gap: 10px; }
+        .icon-btn { background: var(--surface-white); border: 1px solid var(--border-soft); color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: 0.2s;}
+        .icon-btn:hover { background: #fff; transform: scale(1.05); }
+
+        /* =========================================
+           Auth Modal (Google Login / Setup)
+        ========================================= */
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(240, 249, 255, 0.95); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        .auth-content { background: #fff; padding: 40px 30px; border-radius: var(--radius-xl); width: 85%; max-width: 350px; text-align: center; box-shadow: var(--shadow-soft); }
+        .auth-content h2 { color: #0284c7; margin: 0 0 10px 0; font-size: 1.6rem; }
+        .auth-content p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; }
         
-        .weather-settings-btn { background: var(--surface-white); border: 1px solid var(--border-soft); color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .google-btn { width: 100%; background: #ffffff; color: #334155; border: 2px solid #e2e8f0; padding: 14px; border-radius: var(--radius-md); font-weight: bold; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .google-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .google-icon { width: 20px; height: 20px; }
+
+        .auth-content input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: var(--radius-md); font-size: 1.1rem; font-weight: bold; margin-bottom: 20px; outline: none; box-sizing: border-box; text-align: center;}
+        .auth-content input:focus { border-color: #0284c7; }
+        
+        .color-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 15px 0 25px; justify-items: center; }
+        .color-option { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
+        .color-option.selected { border-color: #0f172a; transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        .setup-btn { width: 100%; background: #0284c7; color: #fff; border: none; padding: 14px; border-radius: var(--radius-md); font-weight: bold; font-size: 1.1rem; cursor: pointer; }
 
         /* =========================================
-           Register Modal
+           Circle Blocks & Dashboard
         ========================================= */
-        .login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-gradient-1); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-content { background: #fff; padding: 30px; border-radius: var(--radius-xl); width: 85%; max-width: 320px; text-align: center; box-shadow: var(--shadow-soft); }
-        .color-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 25px; }
-        .color-option { height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; }
-        .color-option.selected { border-color: #0f172a; transform: scale(1.1); }
-
-        /* =========================================
-           Circle Blocks
-        ========================================= */
-        .dashboard { display: flex; flex-wrap: wrap; padding: 10px 24px 30px; justify-content: center; align-items: center; align-content: center; flex-grow: 1; overflow: hidden; }
-        .circle-block { 
-            position: relative; border-radius: 50%; background: var(--surface-white); 
-            border: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; 
-            box-shadow: var(--shadow-soft); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); flex-shrink: 0; 
-        }
-        .circle-title { font-weight: 800; color: var(--text-heading); line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding: 0 10%; }
-        .circle-creator { font-size: 0.65rem; font-weight: 800; margin-top: 4px; opacity: 0.9; }
+        .dashboard { display: flex; flex-wrap: wrap; padding: 10px 24px 30px; justify-content: center; align-items: center; align-content: center; flex-grow: 1; overflow: hidden; gap: 15px;}
+        .circle-block { position: relative; border-radius: 50%; background: rgba(255,255,255,0.9); border: 3px solid transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: var(--shadow-soft); transition: all 0.2s; flex-shrink: 0; }
+        .circle-block:hover { transform: scale(1.02); }
+        .circle-title { font-weight: 800; color: var(--text-heading); line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; word-break: break-all; padding: 0 10%; pointer-events: none;}
+        .circle-creator { font-size: 0.65rem; font-weight: 800; margin-top: 4px; opacity: 0.9; pointer-events: none;}
         .badge { position: absolute; top: 0; right: 0; transform: translate(25%, -25%); color: #fff; font-weight: 800; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; z-index: 2; }
 
         /* =========================================
-           Modal General
+           Modals (Task & Project)
         ========================================= */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.2); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s; z-index: 1000; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.3); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 1000; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content { background: #fff; width: 100%; height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-content { background: #fff; width: 100%; height: auto; max-height: 85vh; border-radius: var(--radius-xl) var(--radius-xl) 0 0; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
-        .modal-drag-area { padding: 15px 0; cursor: grab; display: flex; justify-content: center; flex-shrink: 0; }
-        .modal-handle { width: 40px; height: 5px; background: #cbd5e1; border-radius: 3px; }
-        .modal-header { padding: 0 24px 20px; display: flex; justify-content: space-between; align-items: center; }
+        @media (min-width: 600px) { .modal-overlay { align-items: center; } .modal-content { width: 480px; border-radius: var(--radius-xl); transform: translateY(30px) scale(0.95); } .modal-overlay.active .modal-content { transform: translateY(0) scale(1); } }
+        .modal-header { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
         .modal-title-input { border: none; font-size: 1.4rem; font-weight: 800; width: 100%; outline: none; }
+        .close-btn { background: #f1f5f9; border: none; color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 
         /* =========================================
-           Task List Items
+           Task List
         ========================================= */
-        .task-list-container { padding: 0 24px 24px; overflow-y: auto; flex-grow: 1; }
-        .task-item { display: flex; align-items: flex-start; padding: 16px; margin-bottom: 12px; background: #f8fafc; border-radius: var(--radius-lg); border: 1px solid #f1f5f9; }
-        .task-checkbox { appearance: none; width: 22px; height: 22px; border-radius: 50%; margin-right: 15px; cursor: pointer; position: relative; flex-shrink: 0; border: 2px solid #cbd5e1; }
+        .task-list-container { padding: 0 24px 10px; overflow-y: auto; flex-grow: 1; max-height: 50vh; }
+        .task-item { display: flex; align-items: flex-start; padding: 14px; margin-bottom: 10px; background: #f8fafc; border-radius: var(--radius-md); border: 1px solid #e2e8f0; }
+        .task-checkbox { appearance: none; width: 20px; height: 20px; border-radius: 50%; margin-right: 12px; cursor: pointer; position: relative; flex-shrink: 0; border: 2px solid #cbd5e1; }
         .task-checkbox:checked::after { content: '✔'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; font-size: 12px; }
         .task-content { flex-grow: 1; display: flex; flex-direction: column; }
-        .task-text { outline: none; line-height: 1.4; font-weight: 600; color: var(--text-heading); }
+        .task-text { outline: none; line-height: 1.4; font-weight: 600; color: var(--text-heading); font-size: 0.95rem; }
+        .task-item.completed .task-text { text-decoration: line-through; color: var(--text-muted); }
         .task-info { display: flex; gap: 8px; margin-top: 6px; }
         .task-tag { font-size: 0.65rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; color: #fff; }
 
-        /* 天気・入力欄など(共通) */
-        .weather-banner-container { margin: 0 24px 10px; display: none; }
-        .w-matrix { width: 100%; background: #fff; border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow-soft); border: 1px solid #bae6fd; }
-        .w-matrix-row { display: flex; border-bottom: 1px solid #f1f5f9; }
-        .w-matrix-cell { flex: 1; padding: 8px 4px; text-align: center; font-size: 0.75rem; }
-        .add-task-area { display: flex; margin-top: 20px; gap: 10px; padding: 0 24px 24px; }
-        .add-task-input { flex-grow: 1; padding: 14px; border: none; background: #f1f5f9; border-radius: var(--radius-md); outline: none; font-weight: 600; }
-        .add-task-btn { padding: 0 20px; border: none; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; color: #fff; }
+        .add-task-area { display: flex; align-items: center; gap: 8px; padding: 10px 24px 20px; background: #fff; }
+        .assignee-select { padding: 10px 5px; border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-heading); background: #f8fafc; outline: none; cursor: pointer; max-width: 90px;}
+        .add-task-input { flex-grow: 1; padding: 12px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px; outline: none; font-weight: 600; font-size: 0.95rem; }
+        .add-task-btn { padding: 12px 16px; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; color: #fff; white-space: nowrap;}
+        .delete-block-btn { color: #e11d48; border: none; background: none; padding: 15px; font-weight: 800; cursor: pointer; font-size: 0.9rem;}
+        
+        .simple-form p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;}
+        .simple-form input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px; box-sizing: border-box; font-weight: bold;}
+        .simple-form button { width: 100%; padding: 12px; background: #0284c7; color: #fff; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;}
     </style>
 </head>
 <body>
 
-    <div class="member-bar" id="member-bar"></div>
+    <div class="auth-overlay" id="auth-modal">
+        <div class="auth-content" id="login-view">
+            <h2>PM Tasks</h2>
+            <p>プロジェクト管理をスマートに</p>
+            <button class="google-btn" onclick="window.loginWithGoogle()">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Googleでログイン
+            </button>
+        </div>
 
-    <div class="login-overlay" id="login-modal" style="display: none;">
-        <div class="login-content">
-            <h2>プロフィール登録</h2>
-            <div class="color-picker" id="color-picker">
-                <div class="color-option" style="background:#38bdf8" data-color="#38bdf8"></div>
+        <div class="auth-content" id="setup-view" style="display:none;">
+            <h2>プロフィール設定</h2>
+            <p>表示名とマイカラーを設定してください</p>
+            
+            <input type="text" id="setup-name" placeholder="表示名 (例: 山田)">
+            
+            <div class="color-picker" id="setup-color-picker">
+                <div class="color-option selected" style="background:#38bdf8" data-color="#38bdf8"></div>
                 <div class="color-option" style="background:#fb7185" data-color="#fb7185"></div>
                 <div class="color-option" style="background:#34d399" data-color="#34d399"></div>
                 <div class="color-option" style="background:#fbbf24" data-color="#fbbf24"></div>
                 <div class="color-option" style="background:#a78bfa" data-color="#a78bfa"></div>
                 <div class="color-option" style="background:#f472b6" data-color="#f472b6"></div>
-                <div class="color-option" style="background:#607274" data-color="#607274"></div>
+                <div class="color-option" style="background:#94a3b8" data-color="#94a3b8"></div>
                 <div class="color-option" style="background:#0f172a" data-color="#0f172a"></div>
             </div>
-            <input type="text" id="user-name-input" placeholder="名前を入力（例：山田）">
-            <button id="login-submit-btn">はじめる</button>
+            
+            <button class="setup-btn" onclick="window.completeSetup()">はじめる</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content" style="max-height: 400px;">
+            <div class="modal-header"><h2 style="margin:0;">プロフィール編集</h2><button class="close-btn" onclick="window.closeModal('profile-modal')">✕</button></div>
+            <div class="simple-form" style="padding: 0 24px 24px;">
+                <input type="text" id="edit-name" placeholder="表示名">
+                <div class="color-picker" id="edit-color-picker">
+                    <div class="color-option" style="background:#38bdf8" data-color="#38bdf8"></div>
+                    <div class="color-option" style="background:#fb7185" data-color="#fb7185"></div>
+                    <div class="color-option" style="background:#34d399" data-color="#34d399"></div>
+                    <div class="color-option" style="background:#fbbf24" data-color="#fbbf24"></div>
+                    <div class="color-option" style="background:#a78bfa" data-color="#a78bfa"></div>
+                    <div class="color-option" style="background:#f472b6" data-color="#f472b6"></div>
+                    <div class="color-option" style="background:#94a3b8" data-color="#94a3b8"></div>
+                    <div class="color-option" style="background:#0f172a" data-color="#0f172a"></div>
+                </div>
+                <button onclick="window.saveProfile()">保存する</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-bar">
+        <select class="project-select" id="project-select" onchange="window.switchProject()"></select>
+        <div class="top-bar-actions">
+            <button class="action-btn btn-invite" onclick="window.openModal('invite-modal')">✉️ 招待</button>
+            <button class="action-btn btn-new-proj" onclick="window.openModal('new-project-modal')">➕ 新規PJ</button>
         </div>
     </div>
 
     <header>
         <div class="header-titles">
-            <h1 id="header-name">PM Tasks</h1>
-            <p id="sync-status">📡 Connecting...</p>
+            <h1 id="header-name">My Workspace</h1>
+            <p id="member-list">Members: -</p>
         </div>
-        <button class="weather-settings-btn" onclick="window.openWeatherSettings()">⚙️</button>
+        <div class="header-buttons">
+            <button class="icon-btn" onclick="window.openProfileModal()" title="プロフィール">👤</button>
+            <button class="icon-btn" onclick="window.logout()" title="ログアウト">🚪</button>
+        </div>
     </header>
 
-    <div class="weather-banner-container" id="weather-banner"></div>
     <div class="dashboard" id="dashboard"></div>
 
     <div class="modal-overlay" id="modal">
-        <div class="modal-content" id="modal-content">
-            <div class="modal-drag-area" id="modal-drag"><div class="modal-handle"></div></div>
+        <div class="modal-content">
             <div class="modal-header">
                 <input type="text" class="modal-title-input" id="modal-title">
                 <button class="close-btn" onclick="window.closeModal('modal')">✕</button>
             </div>
             <div class="task-list-container" id="active-tasks"></div>
             <div class="add-task-area">
-                <input type="text" class="add-task-input" id="new-task-input" placeholder="新しいタスクを入力...">
+                <select id="assignee-select" class="assignee-select"></select>
+                <input type="text" class="add-task-input" id="new-task-input" placeholder="タスクを追加..." onkeypress="if(event.key==='Enter') window.addTask()">
                 <button class="add-task-btn" id="add-task-submit" onclick="window.addTask()">追加</button>
             </div>
-            <button style="color:#e11d48; border:none; background:none; padding:20px; font-weight:800; cursor:pointer;" onclick="window.deleteCurrentBlock()">このカテゴリを削除</button>
+            <button class="delete-block-btn" onclick="window.deleteCurrentBlock()">このカテゴリを削除</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="new-project-modal">
+        <div class="modal-content" style="max-height: 300px;">
+            <div class="modal-header"><h2 style="margin:0;">新規プロジェクト作成</h2><button class="close-btn" onclick="window.closeModal('new-project-modal')">✕</button></div>
+            <div class="simple-form" style="padding: 0 24px 24px;">
+                <p>新しいチームタスクや案件用のボードを作成します。</p>
+                <input type="text" id="new-proj-title" placeholder="プロジェクト名 (例: A社CM案件)">
+                <button onclick="window.createNewProject()">作成する</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="invite-modal">
+        <div class="modal-content" style="max-height: 300px;">
+            <div class="modal-header"><h2 style="margin:0;">メンバーを招待</h2><button class="close-btn" onclick="window.closeModal('invite-modal')">✕</button></div>
+            <div class="simple-form" style="padding: 0 24px 24px;">
+                <p>招待したい相手の<b>Googleアカウント（メールアドレス）</b>を入力してください。</p>
+                <input type="email" id="invite-email" placeholder="example@gmail.com">
+                <button onclick="window.inviteMember()">招待する</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        // GoogleAuthProviderを追加
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, query, where, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+        // ==========================================
+        // Firebase Config
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyAKBwm7j4-A__682dRZKxULXeLMX-zLPKE",
             authDomain: "pm-tasks-f9303.firebaseapp.com",
@@ -170,139 +249,277 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
         const db = getFirestore(app);
-        const docRef = doc(db, "pm_app", "main_team");
 
-        let blocks = [];
-        let members = [];
-        let myName = localStorage.getItem('pm_user_name');
-        let myColor = localStorage.getItem('pm_user_color') || "#38bdf8";
-        let currentBlockId = null;
+        // State
+        let currentUser = null;
+        let myProfile = { name: "", color: "#38bdf8" };
+        let projects = []; 
+        let currentProjectId = null;
+        let currentProjectData = null; 
 
         // ==========================================
-        // ユーザー登録処理
+        // 1. Auth & Profile Logic
         // ==========================================
-        const colorOptions = document.querySelectorAll('.color-option');
-        colorOptions.forEach(opt => {
-            if(opt.dataset.color === myColor) opt.classList.add('selected');
-            opt.onclick = () => {
-                colorOptions.forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                myColor = opt.dataset.color;
-            };
-        });
+        
+        // カラーピッカーの初期化関数
+        function setupColorPicker(containerId, onChangeCallback) {
+            const options = document.querySelectorAll(`#${containerId} .color-option`);
+            options.forEach(opt => {
+                opt.onclick = () => {
+                    options.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    onChangeCallback(opt.dataset.color);
+                };
+            });
+        }
+        
+        let tempSetupColor = "#38bdf8";
+        setupColorPicker('setup-color-picker', (c) => tempSetupColor = c);
+        
+        let tempEditColor = "#38bdf8";
+        setupColorPicker('edit-color-picker', (c) => tempEditColor = c);
 
-        document.getElementById('login-submit-btn').onclick = () => {
-            const val = document.getElementById('user-name-input').value.trim();
-            if(!val) return alert("名前を入れてね");
-            myName = val;
-            localStorage.setItem('pm_user_name', myName);
-            localStorage.setItem('pm_user_color', myColor);
-            document.getElementById('login-modal').style.display = 'none';
-            registerMemberToCloud();
-            startApp();
+        // Googleログイン処理
+        window.loginWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+                // 成功後の処理は onAuthStateChanged で自動的に行われます
+            } catch (error) {
+                console.error(error);
+                alert("ログインに失敗しました: " + error.message);
+            }
         };
 
-        if(!myName) {
-            document.getElementById('login-modal').style.display = 'flex';
-        } else {
-            registerMemberToCloud();
-            startApp();
-        }
+        window.logout = () => signOut(auth);
 
-        function registerMemberToCloud() {
-            // メンバーリストを更新（簡易的な重複排除）
-            const exists = members.find(m => m.name === myName);
-            if(!exists) {
-                members.push({ name: myName, color: myColor });
-                saveDataToCloud();
-            }
-        }
-
-        // ==========================================
-        // Firebase 同期
-        // ==========================================
-        function startApp() {
-            document.getElementById('header-name').innerText = `Hello, ${myName}`;
-            onSnapshot(docRef, (snap) => {
-                if(snap.exists()) {
-                    const data = snap.data();
-                    blocks = data.blocks || [];
-                    members = data.members || [];
+        // 認証状態の監視
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                
+                if(userDoc.exists()) {
+                    // すでに登録済みのユーザー
+                    myProfile = userDoc.data();
+                    document.getElementById('auth-modal').style.display = 'none';
+                    listenToMyProjects();
                 } else {
-                    blocks = [];
-                    members = [{ name: myName, color: myColor }];
-                    saveDataToCloud();
+                    // 新規ユーザー（初回ログイン）
+                    document.getElementById('login-view').style.display = 'none';
+                    document.getElementById('setup-view').style.display = 'block';
+                    // Googleから取得した名前を初期セット
+                    document.getElementById('setup-name').value = user.displayName || "";
                 }
-                renderDashboard();
-                renderMemberBar();
-                if(currentBlockId) renderTasks();
-                document.getElementById('sync-status').innerText = "☁️ Team Synced";
+            } else {
+                // ログアウト状態
+                currentUser = null;
+                document.getElementById('login-view').style.display = 'block';
+                document.getElementById('setup-view').style.display = 'none';
+                document.getElementById('auth-modal').style.display = 'flex';
+                document.getElementById('dashboard').innerHTML = '';
+                document.getElementById('project-select').innerHTML = '';
+            }
+        });
+
+        // 初回セットアップ完了処理
+        window.completeSetup = async () => {
+            const name = document.getElementById('setup-name').value.trim();
+            if(!name) return alert("表示名を入力してください");
+            
+            myProfile = { email: currentUser.email, name: name, color: tempSetupColor };
+            
+            try {
+                // Usersコレクションにプロフィールを保存
+                await setDoc(doc(db, "users", currentUser.uid), myProfile);
+                
+                // 初回用のパーソナルプロジェクトを作成
+                await addDoc(collection(db, "projects"), {
+                    title: "My Personal Tasks",
+                    members: [currentUser.email], 
+                    blocks: []
+                });
+                
+                document.getElementById('auth-modal').style.display = 'none';
+                listenToMyProjects();
+                
+            } catch(e) { alert("登録エラー: " + e.message); }
+        };
+
+        // プロフィール編集
+        window.openProfileModal = () => {
+            document.getElementById('edit-name').value = myProfile.name;
+            tempEditColor = myProfile.color;
+            const options = document.querySelectorAll('#edit-color-picker .color-option');
+            options.forEach(o => {
+                o.classList.remove('selected');
+                if(o.dataset.color === myProfile.color) o.classList.add('selected');
+            });
+            window.openModal('profile-modal');
+        };
+
+        window.saveProfile = async () => {
+            const name = document.getElementById('edit-name').value.trim();
+            if(!name) return;
+            myProfile.name = name;
+            myProfile.color = tempEditColor;
+            await setDoc(doc(db, "users", currentUser.uid), myProfile, {merge: true});
+            window.closeModal('profile-modal');
+            loadCurrentProjectData(); // UIリフレッシュ
+        };
+
+
+        // ==========================================
+        // 2. Project List & Sync
+        // ==========================================
+        function listenToMyProjects() {
+            // 自分がmembers配列に含まれるプロジェクトを監視
+            const q = query(collection(db, "projects"), where("members", "array-contains", currentUser.email));
+            
+            onSnapshot(q, (snapshot) => {
+                projects = [];
+                snapshot.forEach(doc => {
+                    projects.push({ id: doc.id, data: doc.data() });
+                });
+
+                updateProjectSelector();
+
+                if(projects.length > 0 && (!currentProjectId || !projects.find(p=>p.id===currentProjectId))) {
+                    currentProjectId = projects[0].id;
+                    document.getElementById('project-select').value = currentProjectId;
+                }
+                
+                if(projects.length > 0) {
+                    loadCurrentProjectData();
+                }
             });
         }
 
-        function saveDataToCloud() {
-            setDoc(docRef, { blocks, members }, { merge: true });
+        function updateProjectSelector() {
+            const select = document.getElementById('project-select');
+            select.innerHTML = '';
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p.data.title;
+                select.appendChild(opt);
+            });
+            if(projects.find(p=>p.id===currentProjectId)) select.value = currentProjectId;
+        }
+
+        window.switchProject = () => {
+            currentProjectId = document.getElementById('project-select').value;
+            loadCurrentProjectData();
+        };
+
+        function loadCurrentProjectData() {
+            const proj = projects.find(p => p.id === currentProjectId);
+            if(!proj) return;
+            currentProjectData = proj.data;
+            
+            document.getElementById('header-name').innerText = currentProjectData.title;
+            const membersStr = currentProjectData.members.map(m => m.split('@')[0]).join(', ');
+            document.getElementById('member-list').innerText = `👤 参加者: ${membersStr}`;
+
+            updateAssigneeSelect();
+            renderDashboard();
+            
+            if(document.getElementById('modal').classList.contains('active')) renderTasks();
+        }
+
+        function saveCurrentProjectToCloud() {
+            if(!currentProjectId) return;
+            setDoc(doc(db, "projects", currentProjectId), currentProjectData, { merge: true }).catch(e=>console.log(e));
         }
 
         // ==========================================
-        // UI レンダリング
+        // 3. Project Creation & Invitation
         // ==========================================
-        function renderMemberBar() {
-            const bar = document.getElementById('member-bar');
-            bar.innerHTML = '';
-            members.forEach(m => {
-                const chip = document.createElement('div');
-                chip.className = 'member-chip';
-                chip.style.color = m.color;
-                chip.style.borderColor = m.color;
-                chip.innerText = m.name;
-                bar.appendChild(chip);
+        window.createNewProject = async () => {
+            const title = document.getElementById('new-proj-title').value.trim();
+            if(!title) return;
+            await addDoc(collection(db, "projects"), {
+                title: title,
+                members: [currentUser.email],
+                blocks: []
             });
+            document.getElementById('new-proj-title').value = '';
+            window.closeModal('new-project-modal');
+        };
+
+        window.inviteMember = () => {
+            const email = document.getElementById('invite-email').value.trim();
+            if(!email) return;
+            if(!currentProjectData.members.includes(email)) {
+                currentProjectData.members.push(email);
+                saveCurrentProjectToCloud();
+                alert(`${email} を招待しました！`);
+            } else {
+                alert("既に参加しています。");
+            }
+            document.getElementById('invite-email').value = '';
+            window.closeModal('invite-modal');
+        };
+
+        // ==========================================
+        // 4. Dashboard & Task Logic
+        // ==========================================
+        function updateAssigneeSelect() {
+            const select = document.getElementById('assignee-select');
+            select.innerHTML = '';
+            currentProjectData.members.forEach(email => {
+                const opt = document.createElement('option');
+                opt.value = email;
+                opt.innerText = email.split('@')[0];
+                select.appendChild(opt);
+            });
+            select.value = currentUser.email;
         }
 
         function renderDashboard() {
             const dashboardEl = document.getElementById('dashboard');
             dashboardEl.innerHTML = '';
-            const w = dashboardEl.clientWidth - 48;
-            const h = dashboardEl.clientHeight - 40;
+            const w = dashboardEl.clientWidth - 48; const h = dashboardEl.clientHeight - 40;
             if(w <= 0 || h <= 0) return;
 
+            const blocks = currentProjectData.blocks || [];
             const total = blocks.length + 1;
             let optSize = 0;
             for(let c=1; c<=total; c++){
                 let r = Math.ceil(total/c);
-                let size = Math.min((w - (c-1)*12)/c, (h - (r-1)*12)/r);
+                let size = Math.min((w - (c-1)*15)/c, (h - (r-1)*15)/r);
                 if(size > optSize) optSize = size;
             }
-            let baseSize = Math.min(Math.max(optSize, 50), 140);
+            let baseSize = Math.min(Math.max(Math.floor(optSize), 60), 140);
 
             blocks.forEach(b => {
-                const uncompleted = b.items.filter(i => !i.completed).length;
+                const uncompleted = b.items ? b.items.filter(i => !i.completed).length : 0;
                 const circle = document.createElement('div');
                 circle.className = 'circle-block';
                 circle.style.width = circle.style.height = `${baseSize}px`;
-                circle.style.borderColor = b.color || myColor;
+                circle.style.borderColor = b.color || '#ccc';
                 circle.onclick = () => window.openTaskModal(b.id);
 
                 const title = document.createElement('div');
                 title.className = 'circle-title';
-                title.style.fontSize = `${baseSize * 0.14}px`;
+                title.style.fontSize = `${Math.max(10, baseSize * 0.14)}px`;
                 title.innerText = b.title;
                 circle.appendChild(title);
 
                 const creator = document.createElement('div');
                 creator.className = 'circle-creator';
-                creator.style.color = b.color || myColor;
+                creator.style.color = b.color || '#ccc';
                 creator.innerText = `by ${b.userName}`;
                 circle.appendChild(creator);
 
                 if(uncompleted > 0) {
                     const badge = document.createElement('div');
                     badge.className = 'badge';
-                    const bs = Math.max(20, baseSize * 0.3);
+                    const bs = Math.max(22, baseSize * 0.3);
                     badge.style.width = badge.style.height = `${bs}px`;
-                    badge.style.background = b.color || myColor;
+                    badge.style.background = b.color || '#ccc';
                     badge.style.fontSize = `${bs * 0.5}px`;
                     badge.innerText = uncompleted;
                     circle.appendChild(badge);
@@ -313,37 +530,43 @@
             const add = document.createElement('div');
             add.className = 'circle-block add-new';
             add.style.width = add.style.height = `${baseSize}px`;
-            add.innerHTML = `<span style="font-size:2rem; color:${myColor}">＋</span>`;
+            add.innerHTML = `<span style="font-size:2rem; color:#0284c7">＋</span>`;
             add.onclick = window.addNewBlock;
             dashboardEl.appendChild(add);
         }
 
-        // ==========================================
-        // モーダル操作 & タスク処理
-        // ==========================================
         window.addNewBlock = () => {
             const id = Date.now().toString();
-            blocks.push({ id, title: "新規カテゴリ", userName: myName, color: myColor, items: [] });
-            saveDataToCloud();
+            if(!currentProjectData.blocks) currentProjectData.blocks = [];
+            currentProjectData.blocks.push({ id, title: "新規カテゴリ", userName: myProfile.name, color: myProfile.color, items: [] });
+            saveCurrentProjectToCloud();
             window.openTaskModal(id);
         };
 
         window.openTaskModal = (id) => {
             currentBlockId = id;
-            const b = blocks.find(x => x.id === id);
+            const b = currentProjectData.blocks.find(x => x.id === id);
+            if(!b) return;
             const titleInput = document.getElementById('modal-title');
             titleInput.value = b.title;
             titleInput.style.color = b.color;
             document.getElementById('add-task-submit').style.background = b.color;
+            
             renderTasks();
             document.getElementById('modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        };
+
+        document.getElementById('modal-title').oninput = (e) => {
+            const b = currentProjectData.blocks.find(x => x.id === currentBlockId);
+            b.title = e.target.value;
+            saveCurrentProjectToCloud();
         };
 
         function renderTasks() {
-            const b = blocks.find(x => x.id === currentBlockId);
+            const b = currentProjectData.blocks.find(x => x.id === currentBlockId);
             const container = document.getElementById('active-tasks');
             container.innerHTML = '';
+            if(!b.items) b.items = [];
             b.items.forEach(item => {
                 const div = document.createElement('div');
                 div.className = `task-item ${item.completed ? 'completed' : ''}`;
@@ -351,24 +574,25 @@
                 const cb = document.createElement('input');
                 cb.type = 'checkbox'; cb.className = 'task-checkbox';
                 cb.checked = item.completed;
-                cb.style.backgroundColor = item.completed ? item.color : 'transparent';
-                cb.style.borderColor = item.color;
-                cb.onchange = () => { item.completed = cb.checked; saveDataToCloud(); };
+                cb.style.backgroundColor = item.completed ? item.assigneeColor : 'transparent';
+                cb.style.borderColor = item.assigneeColor;
+                cb.onchange = () => { item.completed = cb.checked; saveCurrentProjectToCloud(); };
 
                 const content = document.createElement('div');
                 content.className = 'task-content';
                 content.innerHTML = `<div class="task-text" contenteditable="true">${item.text}</div>
-                                     <div class="task-info"><span class="task-tag" style="background:${item.color}">${item.userName}</span></div>`;
+                                     <div class="task-info"><span class="task-tag" style="background:${item.assigneeColor}">${item.assigneeName}</span></div>`;
                 
-                // 文字修正の同期
                 content.querySelector('.task-text').onblur = (e) => {
-                    item.text = e.target.innerText;
-                    saveDataToCloud();
+                    if(item.text !== e.target.innerText) {
+                        item.text = e.target.innerText;
+                        saveCurrentProjectToCloud();
+                    }
                 };
 
                 const del = document.createElement('button');
                 del.className = 'delete-task-btn'; del.innerText = '✕';
-                del.onclick = () => { b.items = b.items.filter(i => i.id !== item.id); saveDataToCloud(); };
+                del.onclick = () => { b.items = b.items.filter(i => i.id !== item.id); saveCurrentProjectToCloud(); };
 
                 div.appendChild(cb); div.appendChild(content); div.appendChild(del);
                 container.appendChild(div);
@@ -379,52 +603,38 @@
             const input = document.getElementById('new-task-input');
             const text = input.value.trim();
             if(!text) return;
-            const b = blocks.find(x => x.id === currentBlockId);
-            b.items.push({ id: Date.now().toString(), text, userName: myName, color: myColor, completed: false });
+            
+            const assigneeEmail = document.getElementById('assignee-select').value;
+            const aName = assigneeEmail.split('@')[0];
+            const aColor = assigneeEmail === currentUser.email ? myProfile.color : "#94a3b8"; 
+
+            const b = currentProjectData.blocks.find(x => x.id === currentBlockId);
+            if(!b.items) b.items = [];
+            b.items.push({ 
+                id: Date.now().toString(), 
+                text: text, 
+                assigneeName: aName, 
+                assigneeColor: aColor, 
+                completed: false 
+            });
             input.value = '';
-            saveDataToCloud();
+            saveCurrentProjectToCloud();
         };
 
+        window.openModal = (id) => document.getElementById(id).classList.add('active');
         window.closeModal = (id) => {
             document.getElementById(id).classList.remove('active');
-            document.body.style.overflow = '';
-            currentBlockId = null;
+            if(id === 'modal') currentBlockId = null;
         };
 
         window.deleteCurrentBlock = () => {
             if(!confirm("このカテゴリを削除しますか？")) return;
-            blocks = blocks.filter(x => x.id !== currentBlockId);
-            saveDataToCloud();
+            currentProjectData.blocks = currentProjectData.blocks.filter(x => x.id !== currentBlockId);
+            saveCurrentProjectToCloud();
             window.closeModal('modal');
         };
 
-        // スワイプで閉じる
-        setupSwipeToClose('modal', 'modal-content', 'modal-drag');
-        function setupSwipeToClose(mId, cId, dId) {
-            const m = document.getElementById(mId), c = document.getElementById(cId), d = document.getElementById(dId);
-            let startY = 0, currentY = 0, isDragging = false;
-            d.ontouchstart = (e) => { isDragging = true; startY = e.touches[0].clientY; c.style.transition = 'none'; };
-            window.ontouchmove = (e) => {
-                if(!isDragging) return;
-                currentY = e.touches[0].clientY - startY;
-                if(currentY > 0) c.style.transform = `translateY(${currentY}px)`;
-            };
-            window.ontouchend = () => {
-                if(!isDragging) return;
-                isDragging = false; c.style.transition = '';
-                if(currentY > 150) window.closeModal(mId); else c.style.transform = '';
-                currentY = 0;
-            };
-        }
-
-        // タイトル変更の即時反映
-        document.getElementById('modal-title').oninput = (e) => {
-            const b = blocks.find(x => x.id === currentBlockId);
-            b.title = e.target.value;
-            saveDataToCloud();
-        };
-
-        window.addEventListener('resize', renderDashboard);
+        window.addEventListener('resize', () => { if(currentProjectData) renderDashboard(); });
     </script>
 </body>
 </html>
