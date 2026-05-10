@@ -270,14 +270,12 @@
         let showCompletedTasks = false; 
         let memberProfiles = {};
         
-        // ✨ クリック位置記憶（餌や波紋の起点用）
         let lastClickX = window.innerWidth / 2;
         let lastClickY = window.innerHeight / 2;
 
         const colors = ["#38bdf8", "#fb7185", "#34d399", "#fbbf24", "#a78bfa", "#f472b6", "#fb923c", "#0f172a"];
         let selC = colors[0];
 
-        // ✨ 画面全体のタップで水の波紋を出す
         document.addEventListener('click', (e) => {
             lastClickX = e.clientX; lastClickY = e.clientY;
             const ripple = document.createElement('div');
@@ -318,6 +316,10 @@
                     myP = d.data(); 
                     myP._isDummy = false; 
                     memberProfiles[user.email] = myP; 
+                    
+                    // ✨ 鯉のサイズをクラウドから復元
+                    kSize = myP.koiSize || 1.0; 
+
                     updateHeaderIcon(); 
                     loadPJs(); 
                 } else { showSetup(); }
@@ -345,7 +347,7 @@
         window.finishSetup = async () => {
             const name = document.getElementById('setup-n').value;
             if(!name) return alert("名前を入力してね");
-            myP = { email: user.email, name, color: selC, photo: tempPhoto };
+            myP = { email: user.email, name, color: selC, photo: tempPhoto, koiSize: 1.0 }; // ✨ 初期サイズ設定
             await setDoc(doc(db, "users", user.uid), myP);
             myP._isDummy = false; memberProfiles[user.email] = myP;
             await addDoc(collection(db, "projects"), { title: "My Tasks", members: [user.email], blocks: [] });
@@ -551,14 +553,13 @@
             input.value = ''; await save();
         };
 
-        // ✨ タスク完了処理に「餌やり」ロジックを追加
+        // ✨ タスク完了時に餌やり＆成長データのクラウド保存
         window.toggleT = async (tid, color) => { 
             const b = curPD.blocks.find(x=>x.id==curBId); 
             const i = b.items.find(x=>x.id==tid); 
             const wasCompleted = i.completed;
             i.completed = !i.completed; 
             
-            // 未完了から完了になった瞬間、餌を落とす
             if (!wasCompleted && i.completed) {
                 spawnFood(lastClickX, lastClickY, color);
             }
@@ -595,11 +596,16 @@
         function updateProjList() { const sel = document.getElementById('proj-sel'); sel.innerHTML = ''; pjs.forEach(p => { const o = document.createElement('option'); o.value = p.id; o.innerText = p.data.title; sel.appendChild(o); }); sel.value = curPId; }
         function updateAssList() { const sel = document.getElementById('ass-sel'); sel.innerHTML = ''; const activeMembers = curPD.members.filter(m => memberProfiles[m] && !memberProfiles[m]._isDummy); activeMembers.forEach(m => { const o = document.createElement('option'); o.value = m; o.innerText = memberProfiles[m].name; sel.appendChild(o); }); sel.value = user.email; }
 
-        // ✨ 鯉の成長と泳ぐロジック
+        const KOI_BASE_SPEED = 0.6;     
+        const KOI_CHASE_SPEED = 3.0;    
+        const KOI_TURN_SOFTNESS = 0.02; 
+        const SWAY_AMP = 0.12;           
+        const SWAY_FREQ = 0.003;        
+
         let koiEl = document.getElementById('koi-fish');
         let kX = window.innerWidth / 2, kY = window.innerHeight / 2;
         let kAngle = 0, kSize = 1.0;
-        let speed = 1.2;
+        let speed = KOI_BASE_SPEED; 
         let currentTarget = null;
         let foods = [];
 
@@ -618,29 +624,31 @@
             let tx, ty;
             
             if (foods.length > 0) {
-                // 餌がある場合は一番最初の餌をターゲットにする
                 tx = foods[0].x; ty = foods[0].y;
-                speed = 3.5; // 餌を見つけたら少し速く泳ぐ
+                speed = KOI_CHASE_SPEED; 
             } else {
-                // 餌がない場合はランダムに散歩
-                if (!currentTarget || Math.random() < 0.005) {
+                if (!currentTarget || Math.random() < 0.003) { 
                     currentTarget = { x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight };
                 }
                 tx = currentTarget.x; ty = currentTarget.y;
-                speed = 1.0;
+                speed = KOI_BASE_SPEED; 
             }
 
             let dx = tx - kX;
             let dy = ty - kY;
             let dist = Math.sqrt(dx*dx + dy*dy);
 
-            // 餌を食べたときの処理
             if (foods.length > 0 && dist < 30) {
                 let f = foods.shift();
                 f.el.remove();
-                kSize = Math.min(kSize + 0.08, 4.0); // 食べるたびに成長（最大サイズ4倍まで）
+                kSize = Math.min(kSize + 0.08, 4.0);
                 
-                // 食べた時に小さな波紋を出す
+                // ✨ 成長サイズをクラウドに即座に保存
+                if (user && myP) {
+                    myP.koiSize = kSize;
+                    setDoc(doc(db, "users", user.uid), { koiSize: kSize }, { merge: true });
+                }
+
                 const ripple = document.createElement('div');
                 ripple.className = 'ripple';
                 ripple.style.left = kX + 'px'; ripple.style.top = kY + 'px';
@@ -649,31 +657,30 @@
                 setTimeout(() => ripple.remove(), 800);
             }
 
-            // 目的地に向かって泳ぐ計算
             if (dist > speed) {
                 let targetAngle = Math.atan2(dy, dx);
                 let deltaAngle = targetAngle - kAngle;
                 
-                // 最短距離で滑らかに回転させる
                 while (deltaAngle > Math.PI) deltaAngle -= Math.PI * 2;
                 while (deltaAngle < -Math.PI) deltaAngle += Math.PI * 2;
-                kAngle += deltaAngle * 0.04;
+                
+                kAngle += deltaAngle * KOI_TURN_SOFTNESS;
 
                 kX += Math.cos(kAngle) * speed;
                 kY += Math.sin(kAngle) * speed;
             }
 
-            // SVGは上が頭(Y-マイナス方向)なので、進行方向の角度に+90度(PI/2)補正する
-            let displayAngle = kAngle + (Math.PI / 2);
-            
+            let baseDisplayAngle = kAngle + (Math.PI / 2);
+            let sway = Math.sin(Date.now() * SWAY_FREQ) * SWAY_AMP;
+            let finalAngle = baseDisplayAngle + sway;
+
             koiEl.style.left = kX + 'px';
             koiEl.style.top = kY + 'px';
-            koiEl.style.transform = `translate(-50%, -50%) scale(${kSize}) rotate(${displayAngle}rad)`;
+            koiEl.style.transform = `translate(-50%, -50%) scale(${kSize}) rotate(${finalAngle}rad)`;
 
             requestAnimationFrame(updateKoi);
         }
         
-        // 鯉のループ開始
         updateKoi();
 
     </script>
