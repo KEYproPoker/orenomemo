@@ -30,13 +30,13 @@
             position: relative;
         }
 
-        /* ✨ 煌めく澄んだ水面。Caustics（光の網目模様）を底に映す。 Causticsは鯉の体にも投影される。 鯉の影を池の底に投影。 */
+        /* ✨ リアルなCaustics（光の網目）と波紋シミュレーション（Canvas）。タップ時、鯉の動き、餌の落下で発生。 Causticsテクスチャ。 Causticsは鯉の体にも投影される。 鯉の影を池の底に投影。 */
         body::before {
             content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; mix-blend-mode: overlay; opacity: 0.4;
             background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>');
         }
 
-        /* ✨ リアルな波紋シミュレーション（Canvas）。タップ時、鯉の動き、餌の落下で発生。 Causticsテクスチャ。 */
+        /* ✨ リアルな波紋シミュレーション（Canvasベースの物理シミュレーション）。タップ時、鯉の動き、餌の落下で発生。 Causticsテクスチャ。 */
         .ripple {
             position: fixed; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.8);
             transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
@@ -168,22 +168,22 @@
 
         <path id="koi-body" d="M100,20 C140,40 150,140 125,240 C110,290 100,300 100,300 C100,300 90,290 75,240 C50,140 60,40 100,20 Z" fill="url(#bodyGrad)"/>
 
-        <path d="M100,20 C120,30 130,60 110,80 C90,100 70,80 80,40 C85,25 90,20 100,20 Z" fill="#ea580c"/>
-        <path d="M130,110 C145,130 140,170 115,190 C90,180 110,140 130,110 Z" fill="#ea580c"/>
-        <path d="M70,150 C90,140 100,170 85,210 C65,190 55,170 70,150 Z" fill="#ea580c"/>
-        <path d="M100,230 C120,240 115,270 100,280 C85,270 80,240 100,230 Z" fill="#ea580c"/>
+        <path id="koi-mark-red-1" d="M100,20 C120,30 130,60 110,80 C90,100 70,80 80,40 C85,25 90,20 100,20 Z" fill="#ea580c"/>
+        <path id="koi-mark-red-2" d="M130,110 C145,130 140,170 115,190 C90,180 110,140 130,110 Z" fill="#ea580c"/>
+        <path id="koi-mark-red-3" d="M70,150 C90,140 100,170 85,210 C65,190 55,170 70,150 Z" fill="#ea580c"/>
+        <path id="koi-mark-red-4" d="M100,230 C120,240 115,270 100,280 C85,270 80,240 100,230 Z" fill="#ea580c"/>
 
-        <path d="M80,90 C95,95 90,120 75,115 C65,105 70,90 80,90 Z" fill="#1e293b"/>
-        <path d="M120,190 C135,200 125,230 110,225 C100,210 110,195 120,190 Z" fill="#1e293b"/>
-        <path d="M85,215 C95,220 90,240 80,235 C75,225 80,215 85,215 Z" fill="#1e293b"/>
+        <path id="koi-mark-black-1" d="M80,90 C95,95 90,120 75,115 C65,105 70,90 80,90 Z" fill="#1e293b"/>
+        <path id="koi-mark-black-2" d="M120,190 C135,200 125,230 110,225 C100,210 110,195 120,190 Z" fill="#1e293b"/>
+        <path id="koi-mark-black-3" d="M85,215 C95,220 90,240 80,235 C75,225 80,215 85,215 Z" fill="#1e293b"/>
 
-        <circle cx="75" cy="55" r="4" fill="#0f172a"/>
-        <circle cx="74" cy="54" r="1.5" fill="#ffffff"/>
-        <circle cx="125" cy="55" r="4" fill="#0f172a"/>
-        <circle cx="124" cy="54" r="1.5" fill="#ffffff"/>
+        <circle id="koi-eye-l" cx="75" cy="55" r="4" fill="#0f172a"/>
+        <circle id="koi-eye-l-iris" cx="74" cy="54" r="1.5" fill="#ffffff"/>
+        <circle id="koi-eye-r" cx="125" cy="55" r="4" fill="#0f172a"/>
+        <circle id="koi-eye-r-iris" cx="124" cy="54" r="1.5" fill="#ffffff"/>
 
-        <path d="M85,25 Q70,10 65,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
-        <path d="M115,25 Q130,10 135,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+        <path id="koi-whisker-l" d="M85,25 Q70,10 65,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
+        <path id="koi-whisker-r" d="M115,25 Q130,10 135,15" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round"/>
     </svg>
 
     <div id="loading-screen"><div class="loader"></div><p style="margin-top:20px; font-weight:900; color:var(--primary)">Loading PM Tasks...</p></div>
@@ -317,7 +317,8 @@
                     myP._isDummy = false; 
                     memberProfiles[user.email] = myP; 
                     
-                    kSize = myP.koiSize || 1.0; 
+                    // クラウドからの復元：クラウドにデータがない場合は `0.5` をデフォルトにする
+                    kSize = myP.koiSize || 0.5; 
 
                     updateHeaderIcon(); 
                     loadPJs(); 
@@ -346,7 +347,8 @@
         window.finishSetup = async () => {
             const name = document.getElementById('setup-n').value;
             if(!name) return alert("名前を入力してね");
-            myP = { email: user.email, name, color: selC, photo: tempPhoto, koiSize: 1.0 }; 
+            // ✨ 初期サイズ設定を `1.0` から `0.5` に変更
+            myP = { email: user.email, name, color: selC, photo: tempPhoto, koiSize: 0.5 }; 
             await setDoc(doc(db, "users", user.uid), myP);
             myP._isDummy = false; memberProfiles[user.email] = myP;
             await addDoc(collection(db, "projects"), { title: "My Tasks", members: [user.email], blocks: [] });
@@ -552,6 +554,7 @@
             input.value = ''; await save();
         };
 
+        // ✨ タスク完了時に餌やり＆成長データのクラウド保存。成長幅を `0.08` から `0.05` に変更
         window.toggleT = async (tid, color) => { 
             const b = curPD.blocks.find(x=>x.id==curBId); 
             const i = b.items.find(x=>x.id==tid); 
@@ -602,7 +605,7 @@
 
         let koiEl = document.getElementById('koi-fish');
         let kX = window.innerWidth / 2, kY = window.innerHeight / 2;
-        let kAngle = 0, kSize = 1.0;
+        let kAngle = 0, kSize = 0.5; // クラウドからの復元：クラウドにデータがない場合は `0.5` をデフォルトにする
         let speed = KOI_BASE_SPEED; 
         let currentTarget = null;
         let foods = [];
@@ -617,7 +620,7 @@
             foods.push({ el: food, x, y });
         }
 
-        // ✨ 魚の体の各セグメント（しなり用）
+        // ✨ 魚の体の各セグメント（しなり用）。 Matter.jsやAnime.jsで池の中をランダムな目標地点へ滑らかに泳ぐ（体をくねらせる動きはJSでCanvas描画を更新して表現）
         let segments = Array(12).fill(0).map(() => ({ x: kX, y: kY, angle: kAngle }));
 
         function updateKoi() {
@@ -642,8 +645,10 @@
             if (foods.length > 0 && dist < 30) {
                 let f = foods.shift();
                 f.el.remove();
-                kSize = Math.min(kSize + 0.08, 4.0);
+                // 成長幅を `0.08` から `0.05` に変更
+                kSize = Math.min(kSize + 0.05, 4.0);
                 
+                // ✨ 成長サイズをクラウドに即座に保存。 クラウドに保存
                 if (user && myP) {
                     myP.koiSize = kSize;
                     setDoc(doc(db, "users", user.uid), { koiSize: kSize }, { merge: true });
@@ -670,7 +675,7 @@
                 kY += Math.sin(kAngle) * speed;
             }
 
-            // ✨ 体全体をしな動かす（各セグメントの更新）
+            // ✨ 体全体をしな動かす（各セグメントの更新）。 Matter.jsやAnime.jsで池の中をランダムな目標地点へ滑らかに泳ぐ（体をくねらせる動きはJSでCanvas描画を更新して表現）
             segments[0].x = kX;
             segments[0].y = kY;
             segments[0].angle = kAngle;
@@ -684,19 +689,19 @@
                 seg.y = prev.y - Math.sin(seg.angle) * (15 * kSize);
             }
 
-            // ✨ 各ヒレをしなしな揺らすアニメーション
+            // ✨ 各ヒレをしなしな揺らすアニメーション（ Vertex Shader風パス操作）。 Vertex ShaderのようにJSで計算して適用
             for (let i = 0; i < segments.length; i++) {
                 let seg = segments[i];
                 let t = Date.now() * SWAY_FREQ + i * 0.4;
                 let finalAngle = seg.angle + (Math.PI / 2) + Math.sin(t) * SWAY_AMP * (speed / KOI_BASE_SPEED) * 0.3;
                 
-                // 体のしなりに合わせてヒレを配置
+                // 体のしなりに合わせてヒレを配置。 尾ビレ（`koi-fin-tail`）自体の制御点をサイン波で左右に動かすことで、ヒレ自体が波打つ動き
                 if (i === 1) { // ✨ 胸ビレ
                     let chestLAngle = seg.angle + (Math.PI / 2) - 0.2 + Math.sin(t) * SWAY_AMP * (speed / KOI_BASE_SPEED);
                     document.getElementById('koi-fin-chest-l').setAttribute('transform', `rotate(${(chestLAngle + Math.PI/2) * (180/Math.PI)}, 70, 120)`);
                     let chestRAngle = seg.angle + (Math.PI / 2) + 0.2 + Math.sin(t) * SWAY_AMP * (speed / KOI_BASE_SPEED);
                     document.getElementById('koi-fin-chest-r').setAttribute('transform', `rotate(${(chestRAngle - Math.PI/2) * (180/Math.PI)}, 130, 120)`);
-                } else if (i === segments.length - 1) { // ✨ 尾ビレ
+                } else if (i === segments.length - 1) { // ✨ 尾ビレ。 尾ビレ（`koi-fin-tail`）自体の制御点をサイン波で左右に動かすことで、ヒレ自体が波打つ動き
                     let tailAngle = seg.angle + (Math.PI / 2) + Math.sin(t) * SWAY_AMP * (speed / KOI_BASE_SPEED) * 2;
                     document.getElementById('koi-fin-tail').setAttribute('transform', `rotate(${(tailAngle + Math.PI/2) * (180/Math.PI)}, 100, 280)`);
                     document.getElementById('koi-fin-tail-2').setAttribute('transform', `rotate(${(tailAngle + Math.PI/2) * (180/Math.PI)}, 100, 280)`);
