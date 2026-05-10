@@ -68,60 +68,103 @@
         
         /* ✨ 新UI：海に浮かぶ「砂浜の島」デザイン */
         .island-panel {
-            background: #fde6b3; /* 砂浜の色 */
-            border: 2px solid #ecd39a;
-            border-radius: 40px; 
-            display: flex; flex-direction: column; 
-            /* 海底へと続く崖の影（ドロップシャドウ）で立体感を演出 */
+            background: #fde6b3; /* ✨ 修正：砂浜の色 */
+            border: 2px solid #ecd39a; /* ✨ 修正：縁 */
+            border-radius: 50%; /* ✨ 修正：丸い島 */
+            aspect-ratio: 1 / 1; /* ✨ 修正：正円 */
+            display: flex; flex-direction: column; align-items: center; justify-content: center; /* ✨ コンテンツを中央に */
+            /* ✨ 修正：立体感のある影（海底へ続く崖） */
             box-shadow: 0 15px 0 rgba(14, 165, 233, 0.4), 0 20px 25px rgba(0,0,0,0.2);
             box-sizing: border-box; width: 100%; max-width: 800px; transition: all 0.3s ease;
             position: relative;
-            margin-bottom: 25px; /* 影の分の余白を確保 */
+            margin-bottom: 25px; /* ✨ 影の分の余白 */
         }
-        /* ✨ 南国の茂み（左上） */
+        /* ✨ 修正：南国の茂み（左上） */
         .island-panel::before {
-            content: ''; position: absolute; top: -15px; left: -10px; width: 60px; height: 50px;
+            content: ''; position: absolute; top: 0; left: 0; transform: translate(-30%, -30%); width: 60px; height: 50px;
             background: #7cb342; border-radius: 60% 40% 70% 50%;
             box-shadow: inset -5px -5px 10px rgba(0,0,0,0.1), 0 5px 0 #558b2f;
             z-index: 1; pointer-events: none;
         }
-        /* ✨ 南国の茂み（右下） */
+        /* ✨ 修正：南国の茂み（右下） */
         .island-panel::after {
-            content: ''; position: absolute; bottom: -10px; right: -15px; width: 70px; height: 45px;
+            content: ''; position: absolute; bottom: 0; right: 0; transform: translate(30%, 30%); width: 70px; height: 45px;
             background: #689f38; border-radius: 40% 60% 50% 70%;
             box-shadow: inset 5px 5px 10px rgba(255,255,255,0.2), 0 5px 0 #33691e;
             z-index: 1; pointer-events: none;
         }
-        .island-panel .panel-header, .island-panel .panel-circles { position: relative; z-index: 2; }
+        /* 島の中のコンテンツ（旗とタスク）は茂みよりも上に。 */
+        .panel-header, .panel-circles { position: relative; z-index: 2; }
 
         .panel-header { 
-            display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; cursor: pointer; 
-            background: transparent; border-radius: 40px; transition: 0.2s;
+            display: flex; justify-content: space-between; align-items: center; padding: 0; cursor: pointer; 
+            background: transparent; border-radius: 0; transition: 0.2s;
+            position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); /* ✨ 修正：島の中央上部に旗を立てる */
+            z-index: 10; /* ✨ 島よりも上に */
+            pointer-events: auto; /* ✨ クリック可能に */
+            width: auto; /* ✨ 幅は中身に合わせる */
         }
-        .island-panel.open .panel-header { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 2px dashed rgba(200, 160, 100, 0.6); }
-        .panel-title { background: transparent; border: none; font-size: 1.2rem; font-weight: 900; color: #5c3a21; outline: none; width: 100%; font-family: inherit; margin-left: 10px; }
-        .toggle-icon { font-size: 0.9rem; color: #8b6a43; transition: transform 0.3s; display: inline-block; }
+        .island-panel.open .panel-header { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: 0; }
+        
+        /* ✨ 新UI：旗のコンテナ */
+        .flag-container {
+            display: flex; align-items: flex-start; /* ✨ 旗竿と旗の体を並べる */
+        }
+
+        /* ✨ 新UI：旗竿 */
+        .flag-pole {
+            width: 6px; height: 100px; /* ✨ 旗竿のサイズ。長さは適宜調整。 */
+            background: #8b6a43; /* ✨ 旗竿の色（茶色） */
+            border-radius: 3px;
+        }
+
+        /* ✨ 新UI：旗の体 */
+        .flag-body {
+            background: #fff; /* ✨ 旗の色 */
+            border: 2px solid #8b6a43; /* ✨ 旗の縁 */
+            padding: 5px 15px; border-radius: 5px; /* ✨ パディングと角丸 */
+            display: flex; align-items: center; gap: 5px; /* ✨ 中身を並べる */
+            margin-left: -3px; /* ✨ 旗竿に少し重ねる */
+            position: relative; /* ✨ 削除ボタンの配置用 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .panel-title { 
+            background: transparent; border: none; font-size: 1rem; font-weight: 900; color: #5c3a21; outline: none; width: 100%; font-family: inherit; 
+            margin-left: 0; /* ✨ マージン調整 */
+        }
+        .toggle-icon { font-size: 0.8rem; color: #8b6a43; transition: transform 0.3s; display: inline-block; }
         .island-panel.open .toggle-icon { transform: rotate(90deg); }
-        .del-group-btn { background: rgba(255, 255, 255, 0.5); border: 1px solid #dcb66a; border-radius: 50%; width: 28px; height: 28px; font-size: 0.8rem; font-weight: 900; color: #8b6a43; cursor: pointer; flex-shrink: 0;}
-        .panel-circles { display: none; flex-wrap: wrap; justify-content: center; align-items: center; padding: 25px 20px 35px; }
+        
+        .del-group-btn { 
+            background: rgba(255, 255, 255, 0.7); border: 1px solid #dcb66a; border-radius: 50%; width: 28px; height: 28px; font-size: 0.8rem; font-weight: 900; color: #8b6a43; cursor: pointer; flex-shrink: 0;
+            position: absolute; top: -10px; right: -10px; /* ✨ 修正：旗の上に配置 */
+        }
+        
+        .panel-circles { display: none; flex-wrap: wrap; justify-content: center; align-items: center; padding: 30px 20px; } /* ✨ 修正：パディング調整。中央に寄せる。旗のために上を少し空ける。 */
         .island-panel.open .panel-circles { display: flex; }
         
+        /* ✨ 修正：「新しい島を追加」ボタンも砂浜の島のようなデザインに */
         .add-new-group { 
             cursor: pointer; border: 3px dashed rgba(255, 255, 255, 0.5); 
             display: flex; justify-content: center; align-items: center; padding: 15px; 
-            background: rgba(255, 255, 255, 0.15); 
-            border-radius: 60px; width: 100%; max-width: 800px; 
-            text-align: center; font-weight: 900; color: rgba(255, 255, 255, 0.9); font-size: 1.1rem;
+            background: #fde6b3; /* ✨ 砂浜の色 */
+            border-radius: 60px; /* ✨ 丸みを帯びた形状 */
+            width: 100%; max-width: 800px; 
+            text-align: center; font-weight: 900; color: #8b6a43; font-size: 1.1rem; /* ✨ 修正：文字色調整 */
             transition: background 0.2s;
+            box-shadow: 0 10px 0 rgba(14, 165, 233, 0.3); /* ✨ 影 */
+            margin-bottom: 10px; /* ✨ 影の分の余白 */
         }
-        .add-new-group:hover { background: rgba(255, 255, 255, 0.3); }
+        .add-new-group:hover { background: #fbe6c3; }
 
         .circle-block { position: relative; box-sizing: border-box; border-radius: 50%; background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.6)); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15); user-select: none; -webkit-user-select: none; flex-shrink: 0; }
         .circle-title { font-weight: 900; line-height: 1.2; padding: 0 10%; pointer-events: none; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color:#0f172a;}
 
+        /* ✨ プラスボタンのスタイル */
         .circle-block.add-new {
-            border: 1px dashed rgba(15, 23, 42, 0.15); 
-            background: rgba(255, 255, 255, 0.3); 
+            border: 1px dashed rgba(15, 23, 42, 0.15); /* 線の太さを1pxにし、色を淡いライトグレーに変更 */
+            background: rgba(255, 255, 255, 0.3); /* 背景を少し透明にしてなじませる */
         }
 
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: none; align-items: flex-end; justify-content: center; z-index: 1000; }
@@ -463,7 +506,7 @@
 
             curPD.groups.forEach(g => {
                 const panel = document.createElement('div');
-                panel.className = 'island-panel';
+                panel.className = 'glass-panel';
                 if (window.openGroups.has(g.id)) panel.classList.add('open');
                 panel.dataset.id = g.id;
 
