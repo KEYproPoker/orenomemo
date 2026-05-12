@@ -346,6 +346,7 @@
             const el = document.getElementById('dashboard'); el.innerHTML = '';
             const isMgr = curPD.managers.includes(user.email);
 
+            // 1. 先にグループ（島）を描画
             curPD.groups.forEach(g => {
                 const isOpen = window.openGroups.has(g.id);
                 const groupEl = document.createElement('div');
@@ -382,6 +383,7 @@
                 el.appendChild(groupEl);
             });
 
+            // 2. 直置きタスク（丸）を描画
             curPD.standaloneBlocks.forEach(b => el.appendChild(createCircleDom(b, null)));
 
             const addT = document.createElement('div');
@@ -597,12 +599,17 @@
                 kX += Math.cos(kAngle) * speed; kY += Math.sin(kAngle) * speed; 
             }
 
+            // ✨ 修正：ダッシュ時のヒレの動きの最適化
+            let speedRatio = speed / currentBaseSpeed;
+            let swayAmp = Math.min(speedRatio, 1.5); // 振れ幅は最大1.5倍まで
+            let swayFreq = currentSwayFreq * Math.min(speedRatio, 2.5); // 尾を振る速さは最大2.5倍まで
+
             let baseDisplayAngle = kAngle + (Math.PI / 2);
-            let bodySway = Math.sin(Date.now() * currentSwayFreq) * SWAY_AMP * (speed / currentBaseSpeed);
+            let bodySway = Math.sin(Date.now() * swayFreq) * SWAY_AMP * swayAmp;
             let finalAngle = baseDisplayAngle + bodySway;
 
-            let finSway = Math.sin(Date.now() * currentSwayFreq * 1.5) * 15 * (speed / currentBaseSpeed); 
-            let tailSway = Math.sin(Date.now() * currentSwayFreq - 1.0) * 25 * (speed / currentBaseSpeed);
+            let finSway = Math.sin(Date.now() * swayFreq * 1.5) * 15 * swayAmp; 
+            let tailSway = Math.sin(Date.now() * swayFreq - 1.0) * 25 * swayAmp;
 
             document.getElementById('koi-fin-chest-l').setAttribute('transform', `rotate(${finSway}, 70, 120)`);
             document.getElementById('koi-fin-chest-r').setAttribute('transform', `rotate(${-finSway}, 130, 120)`);
