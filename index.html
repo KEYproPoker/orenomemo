@@ -188,13 +188,21 @@
         .task-list { padding: 0 24px; overflow-y: auto; flex-grow: 1; }
         .task-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; background: rgba(248, 250, 252, 0.8); border-radius: var(--radius-lg); border: 2px solid #e2e8f0; }
         .drag-handle { cursor: grab; padding: 5px; margin-right: 10px; color: #cbd5e1; font-size: 1.2rem; user-select: none; }
-        .task-checkbox { appearance: none; width: 22px; height: 22px; border-radius: 6px; border: 3px solid #cbd5e1; margin-right: 12px; cursor: pointer; position: relative; }
+        
+        /* ✨ 修正：チェックボックスが潰れないように flex-shrink: 0 と appearance リセットを追加 */
+        .task-checkbox { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border-radius: 6px; border: 3px solid #cbd5e1; margin-right: 12px; cursor: pointer; position: relative; flex-shrink: 0; }
+        
         .task-checkbox:checked { background: var(--primary); border-color: var(--primary); }
         .task-checkbox:checked::after { content: '✔'; position: absolute; inset: 0; color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center; }
         .task-content { flex-grow: 1; display: flex; flex-direction: column; }
         .task-text { font-family: inherit; font-weight: 700; outline: none; color:#0f172a;}
         .task-item.completed .task-text { text-decoration: line-through; opacity: 0.5; }
         .task-tag { font-size: 0.7rem; font-weight: 900; padding: 3px 8px 3px 4px; border-radius: 12px; color: #fff; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px; width: fit-content; }
+        
+        /* ✨ 修正：表示ボタンのネイティブスタイルをリセット */
+        .toggle-completed-btn { appearance: none; -webkit-appearance: none; background: transparent; border: 2px dashed #cbd5e1; color: #64748b; font-weight: 800; padding: 10px 20px; border-radius: 50px; font-size: 0.85rem; cursor: pointer; margin-bottom: 15px; width: 100%; font-family: inherit; transition: 0.2s; }
+        .toggle-completed-btn:hover { border-color: var(--primary); color: var(--primary); background: #f0f9ff;}
+
         .add-area { padding: 20px 24px; display: flex; gap: 8px; border-top: 2px dashed #f1f5f9; }
         .assign-sel { padding: 10px; border-radius: 10px; border: 2px solid #f1f5f9; font-weight: 800; font-family: inherit; color:#0f172a; outline: none; max-width: 140px;}
         .add-input { flex-grow: 1; padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f5f9; font-family: inherit; font-weight: 800; outline: none; }
@@ -277,7 +285,6 @@
         document.addEventListener('click', (e) => { 
             lastClickX = e.clientX; lastClickY = e.clientY; spawnRipple(e.clientX, e.clientY); 
             
-            // ✨ 島の外（背景など）をクリックしたら島を閉じる処理
             if (!isDraggingCircle && !document.querySelector('.modal-overlay.active')) {
                 if (!e.target.closest('.group-container') && window.openGroups.size > 0) {
                     window.openGroups.clear();
@@ -382,7 +389,7 @@
             if(window.openGroups.has(id)) {
                 window.openGroups.delete(id); 
             } else {
-                window.openGroups.clear(); // ✨ 他の島を開いた時は、開いていた島を閉じる（1つだけ開く）
+                window.openGroups.clear(); 
                 window.openGroups.add(id); 
             }
             if (window.renderDash) window.renderDash(); 
@@ -440,7 +447,7 @@
 
             const addG = document.createElement('div');
             addG.className = 'add-new-island';
-            addG.innerHTML = '＋ 新しい島を追加';
+            addG.innerHTML = '＋ 新しいグループを追加';
             addG.onclick = window.addG;
             el.appendChild(addG);
 
@@ -528,7 +535,7 @@
             else curPD.groups.find(x => x.id === gId).blocks.push(newB);
             await save(); window.openTaskM(gId, id);
         };
-        window.addG = async () => { const id = Date.now().toString(); curPD.groups.push({id, title:"新しい島", blocks:[]}); window.openGroups.add(id); await save(); renderDash(); };
+        window.addG = async () => { const id = Date.now().toString(); curPD.groups.push({id, title:"新しいグループ", blocks:[]}); window.openGroups.add(id); await save(); renderDash(); };
         window.updateGN = async (id, v) => { const g = curPD.groups.find(x=>x.id==id); if(g.title!=v){ g.title=v; await save(); } };
         window.delG = async (id) => { if(curPD.groups.find(x=>x.id==id).blocks.length>0) return alert("空にしてから削除してください"); curPD.groups=curPD.groups.filter(x=>x.id!=id); await save(); renderDash(); };
 
@@ -620,9 +627,10 @@
             let currentTurnSoftness = KOI_TURN_SOFTNESS * mf;
             let currentSwayFreq = SWAY_FREQ * mf;
 
+            // ✨ 修正：到達判定の距離を広げて、目標付近でのウロウロ（ブルブル）を防止
             if (foods.length === 0 && currentTarget) {
                 let dx = currentTarget.x - kX, dy = currentTarget.y - kY;
-                if (Math.sqrt(dx*dx + dy*dy) < 10) currentTarget = null;
+                if (Math.sqrt(dx*dx + dy*dy) < 30) currentTarget = null;
             }
 
             if (foods.length > 0) { 
@@ -644,9 +652,12 @@
             }
 
             if (dist > speed) { 
-                let ta = Math.atan2(dy, dx), da = ta - kAngle; 
-                while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2; 
-                kAngle += da * currentTurnSoftness; 
+                // ✨ 修正：ある程度距離が離れている時だけ角度を変え、微細なブレを防ぐ
+                if (dist > 5) {
+                    let ta = Math.atan2(dy, dx), da = ta - kAngle; 
+                    while (da > Math.PI) da -= Math.PI * 2; while (da < -Math.PI) da += Math.PI * 2; 
+                    kAngle += da * currentTurnSoftness; 
+                }
                 kX += Math.cos(kAngle) * speed; kY += Math.sin(kAngle) * speed; 
             }
 
